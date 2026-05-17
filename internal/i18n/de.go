@@ -324,10 +324,10 @@ var de = map[string]string{
 	"docs.reports.overview.body":  "Die Auswertungen zeigen dir deine Umsätze auf einen Blick: den Umsatz des aktuellen Monats, den Gesamtumsatz seit Beginn und den aufsummierten Umsatz des laufenden Jahres. So bekommst du schnell ein Gefühl dafür, wie dein Coaching-Jahr läuft.",
 
 	"docs.settings.coach.title": "Coach-Stammdaten",
-	"docs.settings.coach.body":  "Hier hinterlegst du deine eigenen Daten als Coach: Name, Adresse, E-Mail und Bankverbindung. Diese Angaben erscheinen auf jeder Rechnung, die du erstellst. Trag sie einmal ein und vergiss sie — coachly nimmt sie ab dann automatisch.",
+	"docs.settings.coach.body":  "Hier hinterlegst du deine eigenen Daten als Coach: Name, Adresse und Bankverbindung. Diese Angaben erscheinen auf jeder Rechnung, die du erstellst. Trag sie einmal ein und vergiss sie — coachly nimmt sie ab dann automatisch.",
 
 	"docs.settings.tax.title": "Finanzamt, Team & Steuer",
-	"docs.settings.tax.body":  "In diesem Bereich pflegst du Angaben rund um Steuern: zuständiges Finanzamt, Steuernummer und gegebenenfalls Team-Angaben. Diese Daten landen ebenfalls auf der Rechnung und sind wichtig für die korrekte steuerliche Zuordnung.",
+	"docs.settings.tax.body":  "In diesem Bereich pflegst du das zuständiges Finanzamt. Diese Daten landen ebenfalls auf der Rechnung und sind wichtig für die korrekte steuerliche Zuordnung.",
 
 	"docs.settings.format.title": "Rechnungsnummer-Format",
 	"docs.settings.format.body":  "Hier legst du fest, wie deine Rechnungsnummern aussehen sollen, zum Beispiel „2026001“. Du baust das Format aus Bausteinen wie Jahr, Monat und laufender Nummer zusammen und siehst sofort eine Vorschau, wie die nächste Rechnung heißen wird. Das Format gilt nur für neue Rechnungen — bereits erstellte Nummern bleiben unverändert.",
