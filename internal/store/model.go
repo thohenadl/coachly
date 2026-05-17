@@ -118,6 +118,13 @@ type Counter struct {
 	NextInvoiceNumber int `json:"next_invoice_number"`
 }
 
+// Preferences holds user-configurable runtime settings that aren't part of
+// coach/finanzamt/SMTP. InvoicesDir, when non-empty, overrides the default
+// PDF output folder (FR-P-10).
+type Preferences struct {
+	InvoicesDir string `json:"invoices_dir,omitempty"`
+}
+
 type Data struct {
 	SchemaVersion int           `json:"schema_version"`
 	Coach         Coach         `json:"coach"`
@@ -128,6 +135,7 @@ type Data struct {
 	Tipps         []MonthlyTipp `json:"tipps"`
 	Filters       []SavedFilter `json:"filters"`
 	Counter       Counter       `json:"counter"`
+	Preferences   Preferences   `json:"preferences"`
 }
 
 func NewData() Data {

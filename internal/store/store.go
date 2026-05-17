@@ -121,6 +121,22 @@ func (s *Store) Mutate(fn func(*Data) error) error {
 	return s.flushLocked()
 }
 
+// ReplaceAll overwrites the entire in-memory Data with d and persists.
+// Used by the plaintext-JSON import path. The current session key+salt are
+// reused, so no password re-entry is required.
+func (s *Store) ReplaceAll(d Data) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.open {
+		return errors.New("store: locked")
+	}
+	if err := migrate(&d); err != nil {
+		return err
+	}
+	s.data = d
+	return s.flushLocked()
+}
+
 func (s *Store) flushLocked() error {
 	b, err := json.Marshal(s.data)
 	if err != nil {

@@ -162,18 +162,46 @@ func parseAthleteForm(r *http.Request, id string) (store.Athlete, error) {
 	if err := r.ParseForm(); err != nil {
 		return store.Athlete{}, err
 	}
-	feeStr := strings.Replace(strings.TrimSpace(r.FormValue("monthly_fee")), ",", ".", 1)
+	fields := map[string]string{
+		"first_name":   r.FormValue("first_name"),
+		"last_name":    r.FormValue("last_name"),
+		"street":       r.FormValue("street"),
+		"postal_code":  r.FormValue("postal_code"),
+		"city":         r.FormValue("city"),
+		"country":      r.FormValue("country"),
+		"monthly_fee":  r.FormValue("monthly_fee"),
+		"start_date":   r.FormValue("start_date"),
+		"end_date":     r.FormValue("end_date"),
+		"email":        r.FormValue("email"),
+		"notes":        r.FormValue("notes"),
+	}
+	a, err := parseAthleteFields(fields)
+	if err != nil {
+		return store.Athlete{}, err
+	}
+	a.ID = id
+	return a, nil
+}
+
+// parseAthleteFields builds an Athlete from a flat string map. Used by both
+// the HTML form handler and the CSV importer. ID is not populated — callers
+// set it explicitly (form: existing ID; CSV: from the row, possibly empty).
+func parseAthleteFields(f map[string]string) (store.Athlete, error) {
+	email := strings.TrimSpace(f["email"])
+	if email == "" {
+		return store.Athlete{}, fmt.Errorf("E-Mail ist erforderlich")
+	}
+	feeStr := strings.Replace(strings.TrimSpace(f["monthly_fee"]), ",", ".", 1)
 	feeF, err := strconv.ParseFloat(feeStr, 64)
 	if err != nil {
 		return store.Athlete{}, fmt.Errorf("ungültige Gebühr: %v", err)
 	}
-	startStr := r.FormValue("start_date")
-	start, err := time.Parse("2006-01-02", startStr)
+	start, err := time.Parse("2006-01-02", strings.TrimSpace(f["start_date"]))
 	if err != nil {
 		return store.Athlete{}, fmt.Errorf("ungültiges Startdatum: %v", err)
 	}
 	var endPtr *time.Time
-	if v := r.FormValue("end_date"); v != "" {
+	if v := strings.TrimSpace(f["end_date"]); v != "" {
 		end, err := time.Parse("2006-01-02", v)
 		if err != nil {
 			return store.Athlete{}, fmt.Errorf("ungültiges Enddatum: %v", err)
@@ -181,17 +209,18 @@ func parseAthleteForm(r *http.Request, id string) (store.Athlete, error) {
 		endPtr = &end
 	}
 	return store.Athlete{
-		ID:        id,
-		FirstName: r.FormValue("first_name"),
-		LastName:  r.FormValue("last_name"),
+		FirstName: strings.TrimSpace(f["first_name"]),
+		LastName:  strings.TrimSpace(f["last_name"]),
 		Address: store.Address{
-			Street:     r.FormValue("street"),
-			PostalCode: r.FormValue("postal_code"),
-			City:       r.FormValue("city"),
-			Country:    r.FormValue("country"),
+			Street:     strings.TrimSpace(f["street"]),
+			PostalCode: strings.TrimSpace(f["postal_code"]),
+			City:       strings.TrimSpace(f["city"]),
+			Country:    strings.TrimSpace(f["country"]),
 		},
 		MonthlyFee: store.Money(feeF * 100),
 		StartDate:  start,
 		EndDate:    endPtr,
+		Email:      email,
+		Notes:      strings.TrimSpace(f["notes"]),
 	}, nil
 }

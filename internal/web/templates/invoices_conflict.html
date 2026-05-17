@@ -1,0 +1,50 @@
+{{define "content"}}
+<div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
+  <h2 class="text-lg font-semibold text-slate-900 mb-2">{{t "invoices.conflict.title"}}</h2>
+  <p class="text-sm text-slate-500 mb-6">
+    {{t "invoices.conflict.desc"}}
+    <span class="text-slate-700 font-medium">({{.Count}} × {{.Month}})</span>
+  </p>
+
+  <div class="space-y-3">
+    <form method="post" action="/invoices/new" class="border border-slate-200 rounded-xl p-4 hover:border-teal-300">
+      <input type="hidden" name="month" value="{{.Month}}" />
+      <input type="hidden" name="tipp_default" value="{{.TippDefault}}" />
+      {{range .TippOverrides}}<input type="hidden" name="tipp_{{.AthleteID}}" value="{{.Text}}" />{{end}}
+      <input type="hidden" name="mode" value="append" />
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="font-medium text-slate-900">{{t "invoices.conflict.append"}}</div>
+          <div class="text-xs text-slate-500 mt-1">{{t "invoices.conflict.append_d"}}</div>
+        </div>
+        <button type="submit"
+                class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm whitespace-nowrap">
+          {{t "app.next"}}
+        </button>
+      </div>
+    </form>
+
+    <form method="post" action="/invoices/new" class="border border-slate-200 rounded-xl p-4 hover:border-rose-300"
+          onsubmit="return confirm('{{t "invoices.conflict.overwrite_d"}}');">
+      <input type="hidden" name="month" value="{{.Month}}" />
+      <input type="hidden" name="tipp_default" value="{{.TippDefault}}" />
+      {{range .TippOverrides}}<input type="hidden" name="tipp_{{.AthleteID}}" value="{{.Text}}" />{{end}}
+      <input type="hidden" name="mode" value="overwrite" />
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="font-medium text-slate-900">{{t "invoices.conflict.overwrite"}}</div>
+          <div class="text-xs text-slate-500 mt-1">{{t "invoices.conflict.overwrite_d"}}</div>
+        </div>
+        <button type="submit"
+                class="rounded-full bg-rose-500 hover:bg-rose-400 text-white font-semibold px-5 py-2 text-sm whitespace-nowrap">
+          {{t "app.confirm"}}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="flex justify-end pt-6">
+    <a href="/invoices" class="rounded-full border border-slate-200 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
+  </div>
+</div>
+{{end}}

@@ -7,7 +7,9 @@
     <button @click="tab='coach'"     :class="tab==='coach'     ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.coach"}}</button>
     <button @click="tab='finanzamt'" :class="tab==='finanzamt' ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.finanzamt"}}</button>
     <button @click="tab='smtp'"      :class="tab==='smtp'      ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.smtp"}}</button>
+    <button @click="tab='storage'"   :class="tab==='storage'   ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.storage"}}</button>
     <button @click="tab='password'"  :class="tab==='password'  ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.password"}}</button>
+    <button @click="tab='data'"      :class="tab==='data'      ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.data"}}</button>
   </div>
 
   <div x-show="tab==='coach'">
@@ -58,6 +60,41 @@
       </div>
       <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
     </form>
+  </div>
+
+  <div x-show="tab==='storage'" x-cloak>
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.storage.title"}}</h3>
+    <p class="text-xs text-slate-500 mb-4">{{t "settings.storage.desc"}}</p>
+    <form method="post" action="/settings/storage" class="space-y-3 max-w-2xl">
+      <div>
+        <label class="text-xs text-slate-600">{{t "settings.storage.invoices_dir"}}</label>
+        <input name="invoices_dir" value="{{.Preferences.InvoicesDir}}" placeholder="{{t "settings.storage.placeholder"}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm" />
+        <p class="text-xs text-slate-500 mt-1">{{t "settings.storage.reset"}}</p>
+      </div>
+      <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 space-y-1">
+        <div><span class="text-slate-500">{{t "settings.storage.current"}}</span> <span class="font-mono">{{.EffectiveInvoicesDir}}</span></div>
+        <div><span class="text-slate-500">{{t "settings.storage.default_hint"}}</span> <span class="font-mono">{{.DefaultInvoicesDir}}</span></div>
+      </div>
+      <p class="text-xs text-amber-700">{{t "settings.storage.note_existing"}}</p>
+      <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
+    </form>
+  </div>
+
+  <div x-show="tab==='data'" x-cloak>
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.data.export_title"}}</h3>
+    <p class="text-xs text-slate-500 mb-3">{{t "settings.data.export_desc"}}</p>
+    <a href="/settings/data/export" class="inline-block rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm mb-8">{{t "settings.data.export_button"}}</a>
+
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.data.import_title"}}</h3>
+    <p class="text-xs text-slate-500 mb-3">{{t "settings.data.import_desc"}}</p>
+    <form method="post" action="/settings/data/import/preview" enctype="multipart/form-data" class="space-y-3 mb-8">
+      <input type="file" name="file" accept="application/json,.json" required class="block text-sm" />
+      <button class="rounded-full bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-2 text-sm">{{t "settings.data.import_button"}}</button>
+    </form>
+
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.data.athletes_title"}}</h3>
+    <p class="text-xs text-slate-500 mb-3">{{t "settings.data.athletes_desc"}}</p>
+    <a href="/athletes/import" class="inline-block rounded-full bg-white border border-slate-200 hover:border-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "settings.data.athletes_button"}}</a>
   </div>
 
   <div x-show="tab==='password'" x-cloak>

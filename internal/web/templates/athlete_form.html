@@ -35,7 +35,12 @@
     <input name="country" value="{{.A.Address.Country}}"
            class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
   </div>
-  <div class="grid grid-cols-3 gap-4">
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "athletes.email"}}</label>
+    <input name="email" type="email" value="{{.A.Email}}" required
+           class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none" />
+  </div>
+  <div class="grid grid-cols-2 gap-4">
     <div>
       <label class="text-xs font-medium text-slate-600">{{t "athletes.monthly_fee"}}</label>
       <input name="monthly_fee" type="text" value="{{.FeeStr}}" required
@@ -46,6 +51,8 @@
       <input name="start_date" type="date" value="{{.StartStr}}" required
              class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
     </div>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
     <div>
       <label class="text-xs font-medium text-slate-600">{{t "athletes.end_date"}}</label>
       <input name="end_date" type="date" value="{{.EndStr}}"

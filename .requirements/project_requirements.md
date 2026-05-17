@@ -46,6 +46,7 @@
 - **FR-A-03** — Liste filterbar (nach Name, Status aktiv/inaktiv, Startdatum, Gebühr).
 - **FR-A-04** — Filter benannt speichern und wiederverwenden („Aktiv 2026").
 - **FR-A-05** — Beim Coaching-Start mid-month wird der erste Monatsbeitrag anteilig berechnet (Tagesbasis: verbleibende Tage / Gesamttage im Monat).
+- **FR-A-06** — Athleten können per CSV-Datei in einem Batch importiert werden. Spalten: `id, first_name, last_name, street, postal_code, city, country, monthly_fee, start_date, end_date, email, notes` (Komma oder Semikolon als Trennzeichen). Vor dem Speichern zeigt eine Vorschau neue, unveränderte, konfliktbehaftete (gleiche ID, andere Daten) und fehlerhafte Zeilen; bei Konflikten entscheidet der Nutzer pro Zeile, ob die neuen Daten übernommen werden.
 
 ### 4.2 Rechnungen (`FR-I-*`)
 
@@ -67,7 +68,7 @@
 - **FR-P-07** — Danach Bank-Block: **Bank, Kontoinhaber, IBAN, BIC**.
 - **FR-P-08** — Abschluss: Danke-Zeile + Grußformel.
 - **FR-P-09** — Dateiname: `{firstname}_{month}_{year}_{invoice_number}.pdf` (z. B. `max_05_2026_2026042.pdf`). Die Rechnungsnummer am Ende garantiert Eindeutigkeit, falls zwei Athleten denselben Vornamen haben.
-- **FR-P-10** — PDFs werden in einem festen Ordner unterhalb des Anwendungs-Datenverzeichnisses abgelegt.
+- **FR-P-10** — PDFs werden standardmäßig in einem festen Ordner unterhalb des Anwendungs-Datenverzeichnisses abgelegt. Optional kann in den Einstellungen ein abweichender absoluter Pfad konfiguriert werden; ist dieser gesetzt, werden alle neu erzeugten PDFs dort gespeichert. Bereits zuvor erzeugte PDFs bleiben an ihrem Ursprungsort und werden weiterhin über den in der Rechnung gespeicherten Pfad geöffnet.
 
 ### 4.4 Coaches Tipp (`FR-T-*`)
 
@@ -88,6 +89,7 @@
 - **FR-S-02** — Finanzamt-Daten: Name (Default „Finanzamt Innsbruck"), Adresse.
 - **FR-S-03** — Master-Passwort ändern.
 - **FR-S-04** — SMTP-Felder (deaktiviert in v1, siehe FR-E-03).
+- **FR-S-05** — Daten-Export/Import: Der gesamte Datenbestand kann als unverschlüsselte, eingerückte JSON-Datei exportiert werden (Dateiname `coachly-export-JJJJ-MM-TT.json`). Eine zuvor exportierte JSON-Datei kann wieder importiert werden; der Import ersetzt den gesamten bestehenden Datenbestand und erfordert eine explizite Bestätigung („Ja, alles ersetzen"). Schema-Migration läuft beim Import automatisch.
 
 ### 4.7 Auswertungen (`FR-R-*`) — could-have, **in v1 enthalten**
 
@@ -162,3 +164,5 @@
 | 2026-05-17 | initial | Erstfassung, restrukturiert aus dem ursprünglichen Freitext. |
 | 2026-05-17 | FR-P-09 | Rechnungsnummer dem PDF-Dateinamen hinzugefügt, um Kollisionen bei gleichen Vornamen zu vermeiden. |
 | 2026-05-17 | FR-T-04 | Per-Athlet-Tipp-Override pro Monat ergänzt. |
+| 2026-05-17 | FR-P-10 | Konfigurierbarer Speicherort für Rechnungs-PDFs in den Einstellungen ergänzt; Standard bleibt das App-Datenverzeichnis. |
+| 2026-05-17 | FR-A-06, FR-S-05 | Plaintext-JSON-Export/-Import des gesamten Datenbestands sowie Athleten-Bulk-Import per CSV ergänzt (Vorbereitung für Versionskontrolle). |

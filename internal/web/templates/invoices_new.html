@@ -1,11 +1,21 @@
 {{define "content"}}
 <form method="post" action="/invoices/new" class="bg-white rounded-2xl shadow-sm p-6 max-w-3xl space-y-4">
   {{if .Error}}<div class="p-3 rounded-xl bg-rose-50 text-rose-700 text-sm">{{.Error}}</div>{{end}}
-  <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="text-xs font-medium text-slate-600">{{t "invoices.month"}}</label>
-      <input name="month" type="month" value="{{.Month}}" required
-             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none" />
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "invoices.month"}}</label>
+    <div class="mt-1 grid grid-cols-2 gap-2">
+      <select name="month_num" required
+              class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white">
+        {{range .MonthOptions}}
+        <option value="{{.Value}}" {{if eq .Value $.SelectedMonth}}selected{{end}}>{{.Label}}</option>
+        {{end}}
+      </select>
+      <select name="year" required
+              class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white">
+        {{range .YearOptions}}
+        <option value="{{.}}" {{if eq . $.SelectedYear}}selected{{end}}>{{.}}</option>
+        {{end}}
+      </select>
     </div>
   </div>
   <div>

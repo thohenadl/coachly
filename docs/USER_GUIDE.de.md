@@ -101,6 +101,43 @@ coachly hat (noch) keine eingebaute Backup-Funktion — aber das Backup ist einf
 
 ---
 
-## 8. Updates
+## 8. App komplett zurücksetzen
+
+Manchmal möchtest du coachly auf den Werkszustand zurücksetzen — z. B. weil du das Passwort vergessen hast, mit echten Daten neu starten willst oder die App an jemand anderen weitergibst.
+
+> ⚠️ **Achtung:** Das löscht **alle** Athleten, Rechnungen, Stammdaten und PDFs unwiderruflich. Mache vorher ein Backup (siehe §5), wenn du die Daten noch brauchst.
+
+### Mac
+
+1. **Finder** öffnen.
+2. Im Menü **Gehe zu → Gehe zum Ordner …** (oder `⇧⌘G`).
+3. Pfad eingeben: `~/Library/Application Support/coachly` und Enter.
+4. Den gesamten Ordner-Inhalt in den Papierkorb verschieben (oder den ganzen `coachly`-Ordner löschen).
+5. coachly neu starten — du landest wieder beim Erststart-Passwortdialog.
+
+Alternative im Terminal:
+
+```bash
+rm -rf ~/Library/Application\ Support/coachly
+```
+
+### Windows
+
+1. **Datei-Explorer** öffnen.
+2. In die Adressleiste `%APPDATA%\coachly` eingeben und Enter.
+3. Den gesamten Ordner-Inhalt löschen (oder den `coachly`-Ordner darüber komplett).
+4. coachly neu starten — du landest wieder beim Erststart-Passwortdialog.
+
+### Nur Teile zurücksetzen
+
+| Was du löschen willst | Datei / Ordner |
+|---|---|
+| Alles (Passwort, Athleten, Rechnungen, PDFs) | gesamter `coachly`-Ordner |
+| Nur die Datenbank (Passwort + Athleten + Rechnungen), PDFs behalten | `store.enc` |
+| Nur die erzeugten PDFs, Datenbank behalten | `invoices/` |
+
+---
+
+## 9. Updates
 
 Neue coachly-Version: einfach das neue Zip herunterladen, alte App ersetzen, fertig. Deine Daten (`store.enc`, `invoices/`) bleiben unangetastet, weil sie in einem separaten Ordner liegen.

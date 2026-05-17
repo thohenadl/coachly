@@ -27,8 +27,21 @@
         <td class="text-right">
           <span class="inline-flex px-2 py-0.5 rounded-full text-xs {{.StatusClass}}">{{.StatusLabel}}</span>
         </td>
-        <td class="p-3 text-right">
-          {{if .PDFPath}}<a href="/invoices/{{.Number}}/pdf" class="text-teal-600 hover:underline text-xs">{{t "invoices.open_pdf"}}</a>{{end}}
+        <td class="p-3 text-right whitespace-nowrap">
+          <div class="inline-flex items-center gap-3">
+            {{if eq .Status "paid"}}
+              <form method="post" action="/invoices/{{.Number}}/status" class="inline">
+                <input type="hidden" name="status" value="issued" />
+                <button type="submit" class="text-slate-500 hover:text-slate-700 text-xs">{{t "invoices.mark_unpaid"}}</button>
+              </form>
+            {{else if eq .Status "issued"}}
+              <form method="post" action="/invoices/{{.Number}}/status" class="inline">
+                <input type="hidden" name="status" value="paid" />
+                <button type="submit" class="text-teal-600 hover:text-teal-700 text-xs font-medium">{{t "invoices.mark_paid"}}</button>
+              </form>
+            {{end}}
+            {{if .PDFPath}}<a href="/invoices/{{.Number}}/pdf" target="_blank" rel="noopener" class="text-teal-600 hover:underline text-xs">{{t "invoices.open_pdf"}}</a>{{end}}
+          </div>
         </td>
       </tr>
       {{end}}

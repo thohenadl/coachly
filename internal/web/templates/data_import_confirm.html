@@ -1,0 +1,23 @@
+{{define "content"}}
+<div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
+  <div class="mb-4 p-3 rounded-xl bg-rose-50 text-rose-800 text-sm">
+    <strong>{{t "settings.data.confirm_warning_title"}}</strong>
+    <p class="mt-1">{{t "settings.data.confirm_warning_desc"}}</p>
+  </div>
+
+  <h2 class="text-lg font-semibold text-slate-900 mb-3">{{t "settings.data.confirm_summary"}}</h2>
+  <dl class="grid grid-cols-2 gap-y-2 text-sm mb-6">
+    <dt class="text-slate-500">{{t "athletes.title"}}</dt><dd class="font-medium">{{.AthleteCount}}</dd>
+    <dt class="text-slate-500">{{t "invoices.title"}}</dt><dd class="font-medium">{{.InvoiceCount}}</dd>
+    <dt class="text-slate-500">{{t "settings.data.tipps"}}</dt><dd class="font-medium">{{.TippCount}}</dd>
+    <dt class="text-slate-500">{{t "settings.data.next_number"}}</dt><dd class="font-medium">{{.NextNumber}}</dd>
+    <dt class="text-slate-500">{{t "settings.data.schema_version"}}</dt><dd class="font-medium">{{.SchemaVersion}}</dd>
+  </dl>
+
+  <form method="post" action="/settings/data/import/confirm" class="flex items-center justify-end gap-2">
+    <input type="hidden" name="token" value="{{.Token}}" />
+    <a href="/settings?tab=data" class="rounded-full bg-white border border-slate-200 hover:border-slate-400 text-slate-700 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
+    <button type="submit" class="rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold px-5 py-2 text-sm">{{t "settings.data.confirm_button"}}</button>
+  </form>
+</div>
+{{end}}

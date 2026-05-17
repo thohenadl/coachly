@@ -7,9 +7,15 @@ import (
 	"strings"
 
 	"coachly/internal/i18n"
+	"coachly/internal/invoice"
 	"coachly/internal/store"
 	"coachly/internal/web/templates"
 )
+
+var templateFuncs = template.FuncMap{
+	"t":         i18n.T,
+	"formatEUR": invoice.FormatEUR,
+}
 
 type navItem struct {
 	Key   string
@@ -61,7 +67,7 @@ func buildInitials(fn, ln string) string {
 // request — necessary because each content file defines its own "content"
 // block and Go's html/template forbids duplicate define names in one set.
 func (s *Server) renderPage(w http.ResponseWriter, contentFile string, v view) {
-	t, err := template.New("layout").Funcs(template.FuncMap{"t": i18n.T}).ParseFS(
+	t, err := template.New("layout").Funcs(templateFuncs).ParseFS(
 		templates.FS, "layout.html", contentFile,
 	)
 	if err != nil {
@@ -78,7 +84,7 @@ func (s *Server) renderPage(w http.ResponseWriter, contentFile string, v view) {
 }
 
 func (s *Server) renderAuth(w http.ResponseWriter, v authVM) {
-	t, err := template.New("auth").Funcs(template.FuncMap{"t": i18n.T}).ParseFS(
+	t, err := template.New("auth").Funcs(templateFuncs).ParseFS(
 		templates.FS, "auth.html",
 	)
 	if err != nil {

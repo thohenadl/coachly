@@ -64,6 +64,42 @@ func BuildBatch(s *store.Store, year int, month time.Month, tipp TippInput) ([]s
 	return out, err
 }
 
+// DeleteForMonth removes every invoice belonging to monthKey and returns the
+// PDF paths that the caller is responsible for unlinking from disk.
+// Note: Counter.NextInvoiceNumber is *not* rewound — fresh recreation will use
+// the next available numbers, which keeps the sequence monotonic.
+func DeleteForMonth(s *store.Store, monthKey string) ([]string, error) {
+	var removedPDFs []string
+	err := s.Mutate(func(d *store.Data) error {
+		kept := d.Invoices[:0]
+		for _, inv := range d.Invoices {
+			if inv.Month == monthKey {
+				if inv.PDFPath != "" {
+					removedPDFs = append(removedPDFs, inv.PDFPath)
+				}
+				continue
+			}
+			kept = append(kept, inv)
+		}
+		d.Invoices = kept
+		return nil
+	})
+	return removedPDFs, err
+}
+
+// SetStatus updates an invoice's status (e.g. issued ↔ paid).
+func SetStatus(s *store.Store, number int, status store.InvoiceStatus) error {
+	return s.Mutate(func(d *store.Data) error {
+		for i := range d.Invoices {
+			if d.Invoices[i].Number == number {
+				d.Invoices[i].Status = status
+				return nil
+			}
+		}
+		return fmt.Errorf("invoice %d not found", number)
+	})
+}
+
 // Finalize marks an invoice as issued and records the PDF path.
 func Finalize(s *store.Store, number int, pdfPath string) error {
 	return s.Mutate(func(d *store.Data) error {

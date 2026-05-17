@@ -11,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"coachly/internal/i18n"
 	"coachly/internal/store"
 	"coachly/internal/web/templates"
 )
@@ -28,6 +27,10 @@ type Server struct {
 	sessions map[string]time.Time
 	// Pending invoice batches awaiting confirmation (keyed by batch_id).
 	batches map[string]*Batch
+	// Pending JSON imports awaiting "are you sure" confirmation (keyed by token).
+	pendingImports map[string]store.Data
+	// Pending bulk athlete CSV imports awaiting confirmation (keyed by token).
+	pendingAthleteImports map[string]*athleteImport
 }
 
 // Batch holds preview-stage invoice drafts before confirmation.
@@ -38,9 +41,7 @@ type Batch struct {
 
 func NewServer(s *store.Store, dataDir, invoicesDir string, assets fs.FS) (*Server, error) {
 	tmpl, err := template.New("").
-		Funcs(template.FuncMap{
-			"t": i18n.T,
-		}).
+		Funcs(templateFuncs).
 		ParseFS(templates.FS, "*.html")
 	if err != nil {
 		return nil, err
@@ -51,8 +52,10 @@ func NewServer(s *store.Store, dataDir, invoicesDir string, assets fs.FS) (*Serv
 		InvoicesDir: invoicesDir,
 		AssetsFS:    assets,
 		tmpl:        tmpl,
-		sessions:    map[string]time.Time{},
-		batches:     map[string]*Batch{},
+		sessions:              map[string]time.Time{},
+		batches:               map[string]*Batch{},
+		pendingImports:        map[string]store.Data{},
+		pendingAthleteImports: map[string]*athleteImport{},
 	}, nil
 }
 
@@ -73,6 +76,9 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/athletes", s.handleAthletes)
 		r.Get("/athletes/new", s.handleAthleteForm)
 		r.Post("/athletes/new", s.handleAthleteCreate)
+		r.Get("/athletes/import", s.handleAthleteImportForm)
+		r.Post("/athletes/import/preview", s.handleAthleteImportPreview)
+		r.Post("/athletes/import/confirm", s.handleAthleteImportConfirm)
 		r.Get("/athletes/{id}/edit", s.handleAthleteForm)
 		r.Post("/athletes/{id}/edit", s.handleAthleteUpdate)
 		r.Post("/athletes/{id}/delete", s.handleAthleteDelete)
@@ -81,6 +87,7 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/invoices/new", s.handleInvoicesNewForm)
 		r.Post("/invoices/new", s.handleInvoicesPreview)
 		r.Post("/invoices/confirm", s.handleInvoicesConfirm)
+		r.Post("/invoices/{number}/status", s.handleInvoiceStatus)
 		r.Get("/invoices/{number}/pdf", s.handleInvoicePDF)
 
 		r.Get("/reports", s.handleReports)
@@ -89,7 +96,11 @@ func (s *Server) Routes() http.Handler {
 		r.Post("/settings/coach", s.handleSettingsCoach)
 		r.Post("/settings/finanzamt", s.handleSettingsFinanzamt)
 		r.Post("/settings/smtp", s.handleSettingsSMTP)
+		r.Post("/settings/storage", s.handleSettingsStorage)
 		r.Post("/settings/password", s.handleSettingsPassword)
+		r.Get("/settings/data/export", s.handleDataExport)
+		r.Post("/settings/data/import/preview", s.handleDataImportPreview)
+		r.Post("/settings/data/import/confirm", s.handleDataImportConfirm)
 	})
 
 	return r
@@ -137,6 +148,15 @@ func (s *Server) hasSession(r *http.Request) bool {
 		return false
 	}
 	return true
+}
+
+// invoicesDirFor returns the effective output folder for invoice PDFs:
+// the user-configured override if set, otherwise the platform default.
+func (s *Server) invoicesDirFor(d store.Data) string {
+	if dir := d.Preferences.InvoicesDir; dir != "" {
+		return dir
+	}
+	return s.InvoicesDir
 }
 
 func (s *Server) requireAuth(next http.Handler) http.Handler {

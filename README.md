@@ -37,3 +37,20 @@ go run .
 ```bash
 go test ./...
 ```
+
+## App im Dev-Mode zurücksetzen
+
+Der gesamte Zustand (verschlüsselte DB + erzeugte PDFs) liegt im OS-Datenverzeichnis. Löschen = Reset auf Erststart.
+
+```bash
+# Mac: alles zurücksetzen (verschlüsselte DB + PDFs)
+rm -rf ~/Library/Application\ Support/coachly
+
+# Nur Datenbank löschen, PDFs behalten
+rm ~/Library/Application\ Support/coachly/store.enc
+
+# Nur PDFs löschen, Datenbank behalten
+rm -rf ~/Library/Application\ Support/coachly/invoices
+```
+
+Unter Windows liegt der entsprechende Ordner unter `%APPDATA%\coachly\`.
