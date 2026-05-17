@@ -1,10 +1,25 @@
 {{define "content"}}
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
   {{range .Tiles}}
-  <div class="bg-white rounded-2xl p-5 shadow-sm">
+  <div class="bg-white rounded-2xl p-5 shadow-sm flex flex-col">
     <div class="text-xs uppercase tracking-wide text-slate-500">{{.Label}}</div>
-    <div class="text-2xl font-semibold mt-2">{{.Value}}</div>
     {{if .Sub}}<div class="text-xs text-slate-400 mt-1">{{.Sub}}</div>{{end}}
+    {{if .HasSplit}}
+    <dl class="mt-3 space-y-1 text-sm">
+      {{range .Lines}}
+      <div class="flex justify-between">
+        <dt class="text-slate-500">{{.Label}}</dt>
+        <dd class="tabular-nums text-slate-700">{{.Value}}</dd>
+      </div>
+      {{end}}
+    </dl>
+    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-baseline">
+      <span class="text-xs uppercase tracking-wide text-slate-500">{{t "reports.sum"}}</span>
+      <span class="text-2xl font-semibold tabular-nums">{{.Total}}</span>
+    </div>
+    {{else}}
+    <div class="text-2xl font-semibold mt-3 tabular-nums">{{.Total}}</div>
+    {{end}}
   </div>
   {{end}}
 </div>

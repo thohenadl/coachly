@@ -39,11 +39,21 @@ func reverse(s string) string {
 	return string(r)
 }
 
-// PDFFilename returns "max_05_2026_2026042.pdf" style names (FR-P-09).
-// The invoice number suffix guarantees uniqueness when multiple athletes
-// share a first name.
-func PDFFilename(firstName string, year int, month, number int) string {
-	return fmt.Sprintf("%s_%02d_%04d_%d.pdf", sanitize(firstName), month, year, number)
+// PDFFilename returns "max_05_2026_<displayNumber>.pdf" style names (FR-P-09).
+// The display-number suffix guarantees uniqueness when multiple athletes
+// share a first name and follows the configured invoice-number format.
+// Both firstName and displayNumber are sanitised so the result is always a
+// safe filename on macOS and Windows.
+func PDFFilename(firstName string, year int, month int, displayNumber string) string {
+	first := sanitize(firstName)
+	if first == "" {
+		first = "athlete"
+	}
+	num := sanitize(displayNumber)
+	if num == "" {
+		num = "0"
+	}
+	return fmt.Sprintf("%s_%02d_%04d_%s.pdf", first, month, year, num)
 }
 
 func sanitize(s string) string {
@@ -57,7 +67,7 @@ func sanitize(s string) string {
 		}
 	}
 	if len(out) == 0 {
-		return "athlete"
+		return ""
 	}
 	return string(out)
 }

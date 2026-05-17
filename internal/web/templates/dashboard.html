@@ -1,11 +1,20 @@
 {{define "content"}}
 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
   {{range .KPIs}}
+  {{if .Link}}
+  <a href="{{.Link}}" class="group block bg-white rounded-2xl p-5 shadow-sm hover:shadow transition-shadow relative">
+    <div class="text-xs uppercase tracking-wide text-slate-500">{{.Label}}</div>
+    <div class="text-2xl font-semibold mt-2">{{.Value}}</div>
+    {{if .Sub}}<div class="text-xs text-slate-400 mt-1">{{.Sub}}</div>{{end}}
+    <span aria-hidden="true" class="absolute top-4 right-4 text-slate-300 group-hover:text-teal-500 transition-colors text-lg leading-none">›</span>
+  </a>
+  {{else}}
   <div class="bg-white rounded-2xl p-5 shadow-sm">
     <div class="text-xs uppercase tracking-wide text-slate-500">{{.Label}}</div>
     <div class="text-2xl font-semibold mt-2">{{.Value}}</div>
     {{if .Sub}}<div class="text-xs text-slate-400 mt-1">{{.Sub}}</div>{{end}}
   </div>
+  {{end}}
   {{end}}
 </div>
 
@@ -29,7 +38,7 @@
       <tbody>
         {{range .RecentInvoices}}
         <tr class="border-t border-slate-100">
-          <td class="py-3 font-mono text-xs">{{.Number}}</td>
+          <td class="py-3 font-mono text-xs">{{.Display}}</td>
           <td>{{.Athlete}}</td>
           <td class="text-slate-500">{{.Date}}</td>
           <td class="text-right font-medium">{{.Amount}}</td>
@@ -58,10 +67,10 @@
         new Chart(ctx, {
           type: 'doughnut',
           data: {
-            labels: ['{{t "invoices.status.paid"}}', '{{t "invoices.status.issued"}}', '{{t "invoices.status.pending"}}'],
+            labels: ['{{t "invoices.status.paid"}}', '{{t "invoices.status.sent"}}', '{{t "invoices.status.issued"}}', '{{t "invoices.status.pending"}}'],
             datasets: [{
-              data: [{{.Chart.Paid}}, {{.Chart.Issued}}, {{.Chart.Pending}}],
-              backgroundColor: ['#14b8a6', '#fbbf24', '#cbd5e1'],
+              data: [{{.Chart.Paid}}, {{.Chart.Sent}}, {{.Chart.Issued}}, {{.Chart.Pending}}],
+              backgroundColor: ['#14b8a6', '#6366f1', '#fbbf24', '#cbd5e1'],
               borderWidth: 0
             }]
           },

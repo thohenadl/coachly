@@ -14,10 +14,12 @@ type kpi struct {
 	Label string
 	Value string
 	Sub   string
+	Link  string // empty for non-clickable tiles
 }
 
 type recentRow struct {
 	Number      int
+	Display     string
 	Athlete     string
 	Date        string
 	Amount      string
@@ -29,17 +31,26 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 	d := s.Store.Snapshot()
 	now := time.Now()
 
-	var monthRev, total, paidCt, issuedCt, pendingCt int64
+	var monthRev, monthOpen, monthPaid, total int64
+	var paidCt, sentCt, issuedCt, pendingCt int64
 	monthKey := invoice.FormatMonth(now.Year(), now.Month())
 
 	for _, inv := range d.Invoices {
 		total += int64(inv.Amount)
 		if inv.Month == monthKey {
 			monthRev += int64(inv.Amount)
+			switch inv.Status {
+			case store.StatusIssued, store.StatusSent:
+				monthOpen += int64(inv.Amount)
+			case store.StatusPaid:
+				monthPaid += int64(inv.Amount)
+			}
 		}
 		switch inv.Status {
 		case store.StatusPaid:
 			paidCt++
+		case store.StatusSent:
+			sentCt++
 		case store.StatusIssued:
 			issuedCt++
 		default:
@@ -65,6 +76,7 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 		cls, lbl := statusBadge(inv.Status)
 		recent = append(recent, recentRow{
 			Number:      inv.Number,
+			Display:     displayNumberFallback(inv),
 			Athlete:     a.FirstName + " " + a.LastName,
 			Date:        inv.IssuedAt.Format("02.01.2006"),
 			Amount:      invoice.FormatEUR(inv.Amount),
@@ -74,15 +86,19 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	v := s.chrome("dashboard", i18n.T("app.greeting"), i18n.T("app.subgreeting"))
+	monthLabel := invoice.MonthDE(now.Month())
+	openLink := "/invoices?month=" + monthKey + "&status=open"
+	paidLink := "/invoices?month=" + monthKey + "&status=paid"
 	v["KPIs"] = []kpi{
-		{i18n.T("dash.kpi.month_revenue"), invoice.FormatEUR(store.Money(monthRev)), invoice.MonthDE(now.Month())},
-		{i18n.T("dash.kpi.outstanding"), invoice.FormatEUR(store.Money(0)), ""},
-		{i18n.T("dash.kpi.paid"), invoice.FormatEUR(store.Money(0)), ""},
-		{i18n.T("dash.kpi.athletes"), formatInt(len(d.Athletes)), ""},
+		{Label: i18n.T("dash.kpi.month_revenue"), Value: invoice.FormatEUR(store.Money(monthRev)), Sub: monthLabel},
+		{Label: i18n.T("dash.kpi.outstanding"), Value: invoice.FormatEUR(store.Money(monthOpen)), Sub: monthLabel, Link: openLink},
+		{Label: i18n.T("dash.kpi.paid"), Value: invoice.FormatEUR(store.Money(monthPaid)), Sub: monthLabel, Link: paidLink},
+		{Label: i18n.T("dash.kpi.athletes"), Value: formatInt(len(d.Athletes))},
 	}
 	v["RecentInvoices"] = recent
 	v["Chart"] = map[string]any{
 		"Paid":    paidCt,
+		"Sent":    sentCt,
 		"Issued":  issuedCt,
 		"Pending": pendingCt,
 	}

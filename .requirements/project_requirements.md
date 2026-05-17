@@ -52,10 +52,13 @@
 
 - **FR-I-01** — Rechnungen werden monatlich für alle im Zielmonat aktiven Athleten erzeugt.
 - **FR-I-02** — Der Nutzer wählt den Monat, für den Rechnungen erzeugt werden.
-- **FR-I-03** — Rechnungsnummern sind fortlaufend und werden nie wiederverwendet.
+- **FR-I-03** — Rechnungsnummern sind fortlaufend und werden nie wiederverwendet. Ausnahme: beim expliziten „Mit selber Rechnungsnummer neu erstellen"-Modus (FR-I-09) wird die Nummer einer **gelöschten editierbaren** Rechnung im selben Vorgang wiederverwendet — die Sequenz bleibt damit nach außen lückenlos.
 - **FR-I-04** — Vor dem endgültigen Erzeugen muss der Nutzer alle Rechnungen in einer **Vorschau** durchklicken können.
 - **FR-I-05** — Erst nach Bestätigung werden Rechnungsnummern „verbraucht" und PDFs geschrieben.
 - **FR-I-06** — Eine Rechnung enthält genau **eine** Positionszeile (= ein Monat). Bei Mid-Month-Start wird der Pro-rata-Betrag verwendet.
+- **FR-I-07** — Rechnungs-Lifecycle: **Entwurf → Erstellt → Versendet → Bezahlt**. Statuswechsel `Versendet` und `Bezahlt` sind „geschützt": eine Rechnung in diesem Zustand darf weder gelöscht noch überschrieben werden. Statuswechsel rückwärts (`Versendet → Erstellt`, `Bezahlt → Versendet`) ist über die UI möglich, falls der Coach sich vertan hat.
+- **FR-I-08** — **Einzelrechnung**: Neben dem Monats-Batch kann eine einzelne Rechnung für einen einzelnen Athleten erzeugt werden (Athlet + Monat + Tipp). Es gilt dieselbe Pro-rata-Logik wie für den Batch.
+- **FR-I-09** — **Konflikt-Modus „Mit selber Rechnungsnummer neu erstellen"**: Wenn für einen Monat bereits Rechnungen existieren, kann der Nutzer wählen, alle editierbaren Rechnungen zu löschen und unter ihrer **ursprünglichen Nummer** neu zu erstellen. Geschützte Rechnungen (Versendet / Bezahlt) bleiben unverändert und werden im UI als „übersprungen" angezeigt. Der bestehende Modus „Alle überschreiben" verwendet weiterhin neue Nummern, lässt geschützte Rechnungen aber ebenfalls unangetastet.
 
 ### 4.3 PDF-Ausgabe (`FR-P-*`)
 
@@ -77,19 +80,23 @@
 - **FR-T-03** — Beim Start des Erzeugen-Workflows fragt die App proaktiv nach dem Tipp, falls noch nicht gesetzt.
 - **FR-T-04** — Jeder Athlet kann einen eigenen monatlichen Tipp bekommen (Override des Monats-Default aus FR-T-01). Im Erzeugen-Workflow lässt sich der Tipp pro Athlet individuell anpassen; ohne Override greift der Monats-Default.
 
-### 4.5 Versand / SMTP (`FR-E-*`) — **deferred to v2**
+### 4.5 Versand / SMTP (`FR-E-*`)
 
-- **FR-E-01** — Optionaler automatischer Versand der erzeugten Rechnungen per SMTP.
+- **FR-E-01** — Optionaler Versand der erzeugten Rechnungen per SMTP, direkt aus der Rechnungsliste.
 - **FR-E-02** — SMTP-Zugangsdaten werden verschlüsselt gespeichert (siehe NFR-S-02).
-- **FR-E-03** — In v1 sind die Felder im Stammdaten-Bereich bereits vorhanden, aber der Versand-Button ist deaktiviert.
+- **FR-E-03** — Der Versand-Button ist aktiv, sobald `SMTP.Enabled = true` ist und der Athlet eine E-Mail-Adresse hinterlegt hat. Andernfalls ist er verborgen.
+- **FR-E-04** — Erfolgreicher SMTP-Versand setzt den Status der Rechnung automatisch auf **Versendet**.
+- **FR-E-05** — Versand ist nur für Rechnungen im Status **Erstellt** möglich. Versendet- oder Bezahlt-Rechnungen können nicht erneut versendet werden — der Coach muss sie zuerst manuell auf „Erstellt" zurücksetzen.
+- **FR-E-06** — Verschlüsselungsmodus der SMTP-Verbindung ist explizit wählbar: „Automatisch" (Port-basiert), „SSL / TLS" (implizites TLS, üblicherweise Port 465), „STARTTLS" (üblicherweise Port 587) oder „Unverschlüsselt" (nur lokale Test-Relays). „Automatisch" entspricht dem v1-Verhalten und ist der Default.
 
 ### 4.6 Einstellungen / Stammdaten (`FR-S-*`)
 
 - **FR-S-01** — Coach-Stammdaten: Vorname, Nachname, Adresse, Bank, Kontoinhaber, IBAN, BIC, Steuernummer, UID.
 - **FR-S-02** — Finanzamt-Daten: Name (Default „Finanzamt Innsbruck"), Adresse.
 - **FR-S-03** — Master-Passwort ändern.
-- **FR-S-04** — SMTP-Felder (deaktiviert in v1, siehe FR-E-03).
+- **FR-S-04** — SMTP-Felder (Host, Port, Verschlüsselung, User, Passwort, Absender, Enabled-Schalter), siehe FR-E-*.
 - **FR-S-05** — Daten-Export/Import: Der gesamte Datenbestand kann als unverschlüsselte, eingerückte JSON-Datei exportiert werden (Dateiname `coachly-export-JJJJ-MM-TT.json`). Eine zuvor exportierte JSON-Datei kann wieder importiert werden; der Import ersetzt den gesamten bestehenden Datenbestand und erfordert eine explizite Bestätigung („Ja, alles ersetzen"). Schema-Migration läuft beim Import automatisch.
+- **FR-S-06** — Konfigurierbares Rechnungsnummern-Format: Profil aus Tokens (`{YYYY}`, `{YY}`, `{MM}`, `{NNN}`, `{NNNN}`, `{N}`, `{firstname}`, `{lastname}`, `{initials}`). Der Default `{YYYY}{NNN}` entspricht dem v1-Verhalten. Bestehende Rechnungen behalten ihre Anzeige-Nummer (Einfrieren bei Erstellung); nur neue Rechnungen nutzen das aktuelle Format. Die fortlaufende Zählung (`Counter.NextInvoiceNumber`) bleibt monoton und lückenlos (FR-I-03).
 
 ### 4.7 Auswertungen (`FR-R-*`) — could-have, **in v1 enthalten**
 
@@ -139,7 +146,6 @@
 
 ## 7. Out of Scope (v1)
 
-- SMTP-Versand (Felder vorhanden, Aktion deaktiviert).
 - Kalender, Sessions, Messaging-Features aus dem Mockup.
 - Buchhaltungs-Export, DATEV-Schnittstelle.
 - Mehrsprachigkeit (English-Toggle).
@@ -166,3 +172,7 @@
 | 2026-05-17 | FR-T-04 | Per-Athlet-Tipp-Override pro Monat ergänzt. |
 | 2026-05-17 | FR-P-10 | Konfigurierbarer Speicherort für Rechnungs-PDFs in den Einstellungen ergänzt; Standard bleibt das App-Datenverzeichnis. |
 | 2026-05-17 | FR-A-06, FR-S-05 | Plaintext-JSON-Export/-Import des gesamten Datenbestands sowie Athleten-Bulk-Import per CSV ergänzt (Vorbereitung für Versionskontrolle). |
+| 2026-05-17 | FR-I-07, FR-I-08, FR-I-09 | Rechnungs-Lifecycle um „Versendet" erweitert; Schutz von Versendet/Bezahlt vor Löschung/Überschreibung; Einzelrechnung-Flow; dritte Konflikt-Option „mit selber Nummer neu erstellen". |
+| 2026-05-17 | FR-E-01..05, FR-S-04 | SMTP-Versand aus v2 in v1 promoted: Versand per Klick auf erstellte Rechnungen, SMTP-Enabled-Schalter, automatischer Statuswechsel auf Versendet bei Erfolg. |
+| 2026-05-17 | FR-E-06 | Verschlüsselungsmodus der SMTP-Verbindung explizit wählbar (Auto / SSL / STARTTLS / Unverschlüsselt), damit Provider mit blockiertem STARTTLS-Port via SSL auf 465 nutzbar sind. |
+| 2026-05-17 | FR-S-06 | Konfigurierbares Rechnungsnummern-Format mit Token-Profil; Anzeige-Nummer bei Erstellung eingefroren. |

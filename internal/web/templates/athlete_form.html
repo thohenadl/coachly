@@ -52,10 +52,15 @@
              class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
     </div>
   </div>
-  <div class="grid grid-cols-2 gap-4">
-    <div>
+  <div x-data="{ hasEnd: {{if .EndStr}}true{{else}}false{{end}} }">
+    <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+      <input type="checkbox" x-model="hasEnd"
+             class="h-4 w-4 rounded border-slate-300 text-teal-500 focus:ring-teal-400" />
+      <span>{{t "athletes.has_end_date"}}</span>
+    </label>
+    <div x-show="hasEnd" x-cloak class="mt-2 max-w-xs">
       <label class="text-xs font-medium text-slate-600">{{t "athletes.end_date"}}</label>
-      <input name="end_date" type="date" value="{{.EndStr}}"
+      <input name="end_date" type="date" value="{{.EndStr}}" :disabled="!hasEnd"
              class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
     </div>
   </div>

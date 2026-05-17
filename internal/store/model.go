@@ -4,7 +4,7 @@ import "time"
 
 // SchemaVersion is bumped whenever the on-disk JSON shape changes.
 // Migrations live in store.go (loadAndMigrate).
-const SchemaVersion = 1
+const SchemaVersion = 3
 
 // Money is stored in euro-cents to avoid float pitfalls.
 type Money int64
@@ -42,7 +42,29 @@ type SMTP struct {
 	Password string `json:"password"`
 	From     string `json:"from"`
 	Enabled  bool   `json:"enabled"`
+	// Security selects the transport mode independently of the port:
+	//   "auto"     — derive from port (465 → ssl, anything else → starttls)
+	//   "ssl"      — implicit TLS from the first byte (SMTPS)
+	//   "starttls" — connect plain, then upgrade via STARTTLS
+	//   "none"     — plain TCP only, no encryption (local test relays)
+	// Empty string is treated as "auto" so v1 stores keep their behaviour.
+	Security string `json:"security,omitempty"`
 }
+
+// EmailTemplate is the subject and body that goes out with each invoice
+// email. Tokens (e.g. {Vorname}, {Nummer}, {MM}, {JJJJ}, {CoachVorname})
+// are expanded at send time — see mailer.RenderTemplate.
+type EmailTemplate struct {
+	Subject string `json:"subject"`
+	Body    string `json:"body"`
+}
+
+// DefaultEmailSubject and DefaultEmailBody are used when EmailTemplate is
+// empty (v2 stores migrated to v3, or a fresh install).
+const (
+	DefaultEmailSubject = "Deine Rechnung {Nummer}"
+	DefaultEmailBody    = "Hi {Vorname},\n\nim Anhang findest du deine Rechnung für {MM}/{JJJJ} mit der Nummer {Nummer}.\n\nViele Grüße,\n{CoachVorname}"
+)
 
 type Athlete struct {
 	ID         string     `json:"id"`
@@ -74,22 +96,28 @@ type InvoiceStatus string
 const (
 	StatusPending InvoiceStatus = "pending_pdf"
 	StatusIssued  InvoiceStatus = "issued"
+	StatusSent    InvoiceStatus = "sent"
 	StatusPaid    InvoiceStatus = "paid"
 )
 
 type Invoice struct {
-	Number      int           `json:"number"`
-	AthleteID   string        `json:"athlete_id"`
-	Month       string        `json:"month"` // "2026-05"
-	Tipp        string        `json:"tipp"`
-	Description string        `json:"description"`
-	PeriodFrom  time.Time     `json:"period_from"`
-	PeriodTo    time.Time     `json:"period_to"`
-	Amount      Money         `json:"amount_cents"` // gross, includes 20% USt
-	ProRata     bool          `json:"pro_rata"`
-	Status      InvoiceStatus `json:"status"`
-	IssuedAt    time.Time     `json:"issued_at"`
-	PDFPath     string        `json:"pdf_path,omitempty"`
+	Number int `json:"number"`
+	// DisplayNumber is the human-readable invoice identifier rendered from
+	// Preferences.NumberingFormat at creation time. It is *frozen* — changes
+	// to the format never alter existing invoices (FR-I-03 spirit). Number
+	// remains the internal monotonic id used for URL routing & lookups.
+	DisplayNumber string        `json:"display_number,omitempty"`
+	AthleteID     string        `json:"athlete_id"`
+	Month         string        `json:"month"` // "2026-05"
+	Tipp          string        `json:"tipp"`
+	Description   string        `json:"description"`
+	PeriodFrom    time.Time     `json:"period_from"`
+	PeriodTo      time.Time     `json:"period_to"`
+	Amount        Money         `json:"amount_cents"` // gross, includes 20% USt
+	ProRata       bool          `json:"pro_rata"`
+	Status        InvoiceStatus `json:"status"`
+	IssuedAt      time.Time     `json:"issued_at"`
+	PDFPath       string        `json:"pdf_path,omitempty"`
 }
 
 // MonthlyTipp holds the default tipp for a month plus optional per-athlete
@@ -120,16 +148,25 @@ type Counter struct {
 
 // Preferences holds user-configurable runtime settings that aren't part of
 // coach/finanzamt/SMTP. InvoicesDir, when non-empty, overrides the default
-// PDF output folder (FR-P-10).
+// PDF output folder (FR-P-10). NumberingFormat is the template applied to
+// invoice numbers; empty means "{YYYY}{NNN}" (legacy behaviour). See
+// invoice.FormatDisplayNumber for the supported tokens.
 type Preferences struct {
-	InvoicesDir string `json:"invoices_dir,omitempty"`
+	InvoicesDir     string `json:"invoices_dir,omitempty"`
+	NumberingFormat string `json:"numbering_format,omitempty"`
 }
+
+// DefaultNumberingFormat is used when Preferences.NumberingFormat is empty.
+// It renders the same string a v1 store produced: year + zero-padded counter
+// (e.g. "2026010").
+const DefaultNumberingFormat = "{YYYY}{NNN}"
 
 type Data struct {
 	SchemaVersion int           `json:"schema_version"`
 	Coach         Coach         `json:"coach"`
 	Finanzamt     Finanzamt     `json:"finanzamt"`
 	SMTP          SMTP          `json:"smtp"`
+	EmailTemplate EmailTemplate `json:"email_template"`
 	Athletes      []Athlete     `json:"athletes"`
 	Invoices      []Invoice     `json:"invoices"`
 	Tipps         []MonthlyTipp `json:"tipps"`
@@ -142,6 +179,7 @@ func NewData() Data {
 	return Data{
 		SchemaVersion: SchemaVersion,
 		Finanzamt:     Finanzamt{Name: "Finanzamt Innsbruck"},
+		EmailTemplate: EmailTemplate{Subject: DefaultEmailSubject, Body: DefaultEmailBody},
 		Athletes:      []Athlete{},
 		Invoices:      []Invoice{},
 		Tipps:         []MonthlyTipp{},

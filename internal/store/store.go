@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
 	"coachly/internal/auth"
@@ -201,6 +202,35 @@ func migrate(d *Data) error {
 	case 0:
 		// Treat as v1 (legacy seed).
 		d.SchemaVersion = 1
+		fallthrough
+	case 1:
+		// v1 → v2: Invoice.DisplayNumber, Preferences.NumberingFormat,
+		// SMTP.Security. Existing invoices keep their integer-as-string
+		// identifier so historical printouts continue to round-trip.
+		for i := range d.Invoices {
+			if d.Invoices[i].DisplayNumber == "" {
+				d.Invoices[i].DisplayNumber = strconv.Itoa(d.Invoices[i].Number)
+			}
+		}
+		if d.Preferences.NumberingFormat == "" {
+			d.Preferences.NumberingFormat = DefaultNumberingFormat
+		}
+		if d.SMTP.Security == "" {
+			d.SMTP.Security = "auto"
+		}
+		d.SchemaVersion = 2
+		fallthrough
+	case 2:
+		// v2 → v3: configurable email subject/body for invoice sends.
+		// Seed with the German defaults so existing installs immediately
+		// have a usable template.
+		if d.EmailTemplate.Subject == "" {
+			d.EmailTemplate.Subject = DefaultEmailSubject
+		}
+		if d.EmailTemplate.Body == "" {
+			d.EmailTemplate.Body = DefaultEmailBody
+		}
+		d.SchemaVersion = 3
 		fallthrough
 	case SchemaVersion:
 		return nil

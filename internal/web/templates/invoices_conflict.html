@@ -24,6 +24,24 @@
       </div>
     </form>
 
+    <form method="post" action="/invoices/new" class="border border-slate-200 rounded-xl p-4 hover:border-amber-300"
+          onsubmit="return confirm('{{t "invoices.conflict.same_numbers_d"}}');">
+      <input type="hidden" name="month" value="{{.Month}}" />
+      <input type="hidden" name="tipp_default" value="{{.TippDefault}}" />
+      {{range .TippOverrides}}<input type="hidden" name="tipp_{{.AthleteID}}" value="{{.Text}}" />{{end}}
+      <input type="hidden" name="mode" value="overwrite_keep_numbers" />
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="font-medium text-slate-900">{{t "invoices.conflict.same_numbers"}}</div>
+          <div class="text-xs text-slate-500 mt-1">{{t "invoices.conflict.same_numbers_d"}}</div>
+        </div>
+        <button type="submit"
+                class="rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold px-5 py-2 text-sm whitespace-nowrap">
+          {{t "app.confirm"}}
+        </button>
+      </div>
+    </form>
+
     <form method="post" action="/invoices/new" class="border border-slate-200 rounded-xl p-4 hover:border-rose-300"
           onsubmit="return confirm('{{t "invoices.conflict.overwrite_d"}}');">
       <input type="hidden" name="month" value="{{.Month}}" />

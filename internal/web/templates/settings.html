@@ -32,6 +32,18 @@
         <div><label class="text-xs text-slate-600">Steuernummer</label><input name="steuernummer" value="{{.Coach.Steuernummer}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
         <div><label class="text-xs text-slate-600">UID</label><input name="uid" value="{{.Coach.UID}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
       </div>
+
+      <div class="pt-6 mt-4 border-t border-slate-100">
+        <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.numbering.title"}}</h3>
+        <p class="text-xs text-slate-500 mb-3">{{t "settings.numbering.desc"}}</p>
+        <input name="numbering_format" value="{{.NumberingFormat}}" placeholder="{{t "settings.numbering.placeholder"}}"
+               class="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm" />
+        <div class="mt-2 rounded-xl bg-slate-50 p-3 text-xs text-slate-600 leading-relaxed">
+          <div class="mb-1"><span class="text-slate-500">{{t "settings.numbering.preview"}}</span> <span class="font-mono text-slate-900">{{.NumberingPreview}}</span></div>
+          <div class="text-slate-500">{{t "settings.numbering.tokens"}}</div>
+        </div>
+      </div>
+
       <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
     </form>
   </div>
@@ -48,28 +60,80 @@
     </form>
   </div>
 
-  <div x-show="tab==='smtp'" x-cloak>
-    <div class="p-3 rounded-xl bg-amber-50 text-amber-800 text-sm mb-4">{{t "settings.smtp.disabled_note"}}</div>
-    <form method="post" action="/settings/smtp" class="space-y-3 opacity-70">
+  <div x-show="tab==='smtp'" x-cloak x-data="{ testTo: '{{.SMTP.From}}', testing: false, testOk: null, testMsg: '' }">
+    <form method="post" action="/settings/smtp" class="space-y-3" x-ref="smtpForm">
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-xs text-slate-600">Host</label><input name="host" value="{{.SMTP.Host}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
         <div><label class="text-xs text-slate-600">Port</label><input name="port" type="number" value="{{.SMTP.Port}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div class="col-span-2">
+          <label class="text-xs text-slate-600">{{t "settings.smtp.security"}}</label>
+          <select name="security" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 bg-white">
+            <option value="auto"     {{if or (eq .SMTP.Security "") (eq .SMTP.Security "auto")}}selected{{end}}>{{t "settings.smtp.security.auto"}}</option>
+            <option value="ssl"      {{if eq .SMTP.Security "ssl"}}selected{{end}}>{{t "settings.smtp.security.ssl"}}</option>
+            <option value="starttls" {{if eq .SMTP.Security "starttls"}}selected{{end}}>{{t "settings.smtp.security.starttls"}}</option>
+            <option value="none"     {{if eq .SMTP.Security "none"}}selected{{end}}>{{t "settings.smtp.security.none"}}</option>
+          </select>
+          <p class="text-xs text-slate-500 mt-1">{{t "settings.smtp.security.hint"}}</p>
+        </div>
         <div><label class="text-xs text-slate-600">User</label><input name="user" value="{{.SMTP.User}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
         <div><label class="text-xs text-slate-600">Passwort</label><input name="password" type="password" value="{{.SMTP.Password}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-        <div class="col-span-2"><label class="text-xs text-slate-600">Absender (From)</label><input name="from" value="{{.SMTP.From}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div class="col-span-2"><label class="text-xs text-slate-600">Absender (From)</label><input name="from" value="{{.SMTP.From}}" @input="testTo = $event.target.value" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
       </div>
+      <label class="flex items-start gap-3 pt-2">
+        <input type="checkbox" name="enabled" value="1" {{if .SMTP.Enabled}}checked{{end}} class="mt-1 h-4 w-4 rounded border-slate-300 text-teal-500 focus:ring-teal-400" />
+        <span>
+          <span class="text-sm font-medium text-slate-900">{{t "settings.smtp.enabled"}}</span>
+          <span class="block text-xs text-slate-500 mt-0.5">{{t "settings.smtp.enabled_hint"}}</span>
+        </span>
+      </label>
       <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
     </form>
+
+    <div class="mt-8 border-t border-slate-100 pt-6">
+      <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.smtp.test.title"}}</h3>
+      <p class="text-xs text-slate-500 mb-3">{{t "settings.smtp.test.desc"}}</p>
+      <div class="flex flex-col sm:flex-row gap-2 sm:items-end max-w-xl">
+        <div class="flex-1">
+          <label class="text-xs text-slate-600">{{t "settings.smtp.test.to"}}</label>
+          <input x-model="testTo" type="email" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+        </div>
+        <button type="button"
+                :disabled="testing"
+                @click="testing=true; testOk=null; testMsg='';
+                        const fd = new FormData($refs.smtpForm);
+                        fd.set('to', testTo);
+                        fetch('/settings/smtp/test', {method:'POST', body: fd})
+                          .then(r => r.json())
+                          .then(j => { testOk = j.ok; testMsg = j.message; })
+                          .catch(e => { testOk = false; testMsg = String(e); })
+                          .finally(() => { testing = false; });"
+                class="shrink-0 rounded-full bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-semibold px-5 py-2 text-sm">
+          <span x-show="!testing">{{t "settings.smtp.test.button"}}</span>
+          <span x-show="testing" x-cloak>{{t "settings.smtp.test.sending"}}</span>
+        </button>
+      </div>
+      <div x-show="testOk === true"  x-cloak class="mt-3 p-3 rounded-xl bg-teal-50 text-teal-700 text-sm" x-text="testMsg"></div>
+      <div x-show="testOk === false" x-cloak class="mt-3 p-3 rounded-xl bg-rose-50 text-rose-700 text-sm break-words" x-text="testMsg"></div>
+    </div>
   </div>
 
   <div x-show="tab==='storage'" x-cloak>
     <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.storage.title"}}</h3>
     <p class="text-xs text-slate-500 mb-4">{{t "settings.storage.desc"}}</p>
-    <form method="post" action="/settings/storage" class="space-y-3 max-w-2xl">
+    <form method="post" action="/settings/storage" class="space-y-3 max-w-2xl"
+          x-data="{ pickError: '' }">
       <div>
         <label class="text-xs text-slate-600">{{t "settings.storage.invoices_dir"}}</label>
-        <input name="invoices_dir" value="{{.Preferences.InvoicesDir}}" placeholder="{{t "settings.storage.placeholder"}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm" />
+        <div class="mt-1 flex gap-2">
+          <input x-ref="invoicesDir" name="invoices_dir" value="{{.Preferences.InvoicesDir}}" placeholder="{{t "settings.storage.placeholder"}}" class="flex-1 rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm" />
+          <button type="button"
+                  @click="pickError=''; fetch('/settings/storage/pick', {method:'POST'}).then(async r => { if(r.status===204){return} if(!r.ok){pickError=await r.text()||'{{t "settings.storage.pick_unavailable"}}';return} const j=await r.json(); if(j.path){$refs.invoicesDir.value=j.path} })"
+                  class="shrink-0 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium px-3 py-2 text-sm">
+            {{t "settings.storage.pick"}}
+          </button>
+        </div>
         <p class="text-xs text-slate-500 mt-1">{{t "settings.storage.reset"}}</p>
+        <p x-show="pickError" x-text="pickError" x-cloak class="text-xs text-rose-700 mt-1"></p>
       </div>
       <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 space-y-1">
         <div><span class="text-slate-500">{{t "settings.storage.current"}}</span> <span class="font-mono">{{.EffectiveInvoicesDir}}</span></div>

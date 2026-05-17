@@ -104,6 +104,8 @@ func statusBadge(st store.InvoiceStatus) (string, string) {
 	switch st {
 	case store.StatusPaid:
 		return "bg-teal-100 text-teal-700", i18n.T("invoices.status.paid")
+	case store.StatusSent:
+		return "bg-indigo-100 text-indigo-700", i18n.T("invoices.status.sent")
 	case store.StatusIssued:
 		return "bg-amber-100 text-amber-700", i18n.T("invoices.status.issued")
 	default:

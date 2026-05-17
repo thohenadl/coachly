@@ -1,0 +1,37 @@
+{{define "content"}}
+<div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
+  <h2 class="text-lg font-semibold text-slate-900 mb-2">{{t "invoices.conflict.title"}}</h2>
+  <p class="text-sm text-slate-500 mb-6">
+    {{t "invoices.single.exists"}}
+    <span class="text-slate-700 font-medium">({{.AthleteName}}, {{.Month}})</span>
+  </p>
+
+  {{if .Protected}}
+  <div class="p-3 rounded-xl bg-rose-50 text-rose-700 text-sm mb-6">{{t "invoices.single.exists_protected"}}</div>
+  <div class="flex justify-end">
+    <a href="/invoices" class="rounded-full border border-slate-200 px-5 py-2 text-sm">{{t "app.back"}}</a>
+  </div>
+  {{else}}
+  <form method="post" action="/invoices/new/single" class="border border-slate-200 rounded-xl p-4 hover:border-amber-300 mb-3"
+        onsubmit="return confirm('{{t "invoices.single.recreate"}}');">
+    <input type="hidden" name="month" value="{{.Month}}" />
+    <input type="hidden" name="athlete_id" value="{{.AthleteID}}" />
+    <input type="hidden" name="tipp" value="{{.Tipp}}" />
+    <input type="hidden" name="mode" value="recreate" />
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <div class="font-medium text-slate-900">{{t "invoices.single.recreate"}}</div>
+      </div>
+      <button type="submit"
+              class="rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold px-5 py-2 text-sm whitespace-nowrap">
+        {{t "app.confirm"}}
+      </button>
+    </div>
+  </form>
+
+  <div class="flex justify-end pt-2">
+    <a href="/invoices" class="rounded-full border border-slate-200 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
+  </div>
+  {{end}}
+</div>
+{{end}}

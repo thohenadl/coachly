@@ -1,8 +1,52 @@
 {{define "content"}}
 <div class="flex items-center justify-between mb-4">
   <div></div>
-  <a href="/invoices/new" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">+ {{t "invoices.create"}}</a>
+  <div class="flex items-center gap-2">
+    <a href="/invoices/new/single" class="rounded-full bg-white border border-teal-500 text-teal-700 hover:bg-teal-50 font-semibold px-5 py-2 text-sm">+ {{t "invoices.create_single"}}</a>
+    <a href="/invoices/new" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">+ {{t "invoices.create"}}</a>
+  </div>
 </div>
+
+<form method="get" action="/invoices" class="bg-white rounded-2xl shadow-sm p-4 mb-4 grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "invoices.filter.status"}}</label>
+    <select name="status" onchange="this.form.submit()" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 bg-white text-sm">
+      <option value=""     {{if eq .Filter.Status ""}}selected{{end}}>{{t "invoices.filter.all"}}</option>
+      <option value="open" {{if eq .Filter.Status "open"}}selected{{end}}>{{t "invoices.filter.open"}}</option>
+      <option value="issued"      {{if eq .Filter.Status "issued"}}selected{{end}}>{{t "invoices.status.issued"}}</option>
+      <option value="sent"        {{if eq .Filter.Status "sent"}}selected{{end}}>{{t "invoices.status.sent"}}</option>
+      <option value="paid"        {{if eq .Filter.Status "paid"}}selected{{end}}>{{t "invoices.status.paid"}}</option>
+      <option value="pending_pdf" {{if eq .Filter.Status "pending_pdf"}}selected{{end}}>{{t "invoices.status.pending"}}</option>
+    </select>
+  </div>
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "invoices.filter.athlete"}}</label>
+    <select name="athlete" onchange="this.form.submit()" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 bg-white text-sm">
+      <option value="" {{if eq .Filter.Athlete ""}}selected{{end}}>{{t "invoices.filter.all"}}</option>
+      {{range .AthleteOptions}}
+      <option value="{{.ID}}" {{if eq $.Filter.Athlete .ID}}selected{{end}}>{{.Name}}</option>
+      {{end}}
+    </select>
+  </div>
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "invoices.filter.month"}}</label>
+    <select name="month" onchange="this.form.submit()" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 bg-white text-sm">
+      <option value="" {{if eq .Filter.Month ""}}selected{{end}}>{{t "invoices.filter.all"}}</option>
+      {{range .MonthOptions}}
+      <option value="{{.}}" {{if eq $.Filter.Month .}}selected{{end}}>{{.}}</option>
+      {{end}}
+    </select>
+  </div>
+  <div class="md:col-span-1">
+    <label class="text-xs font-medium text-slate-600">{{t "invoices.filter.search"}}</label>
+    <input name="q" value="{{.Filter.Query}}" placeholder="{{t "invoices.filter.search.placeholder"}}"
+           class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+  </div>
+  <div class="flex items-center gap-3">
+    <button type="submit" class="rounded-full bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 text-sm">{{t "invoices.filter.apply"}}</button>
+    {{if .HasFilter}}<a href="/invoices" class="text-sm text-slate-500 hover:text-slate-700 underline">{{t "invoices.filter.reset"}}</a>{{end}}
+  </div>
+</form>
 
 <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
   {{if .Invoices}}
@@ -20,7 +64,7 @@
     <tbody>
       {{range .Invoices}}
       <tr class="border-t border-slate-100 hover:bg-slate-50">
-        <td class="p-3 font-mono text-xs">{{.Number}}</td>
+        <td class="p-3 font-mono text-xs">{{.Display}}</td>
         <td>{{.Athlete}}</td>
         <td class="text-slate-500">{{.Period}}</td>
         <td class="text-right font-medium">{{.Amount}}</td>
@@ -29,18 +73,38 @@
         </td>
         <td class="p-3 text-right whitespace-nowrap">
           <div class="inline-flex items-center gap-3">
-            {{if eq .Status "paid"}}
-              <form method="post" action="/invoices/{{.Number}}/status" class="inline">
-                <input type="hidden" name="status" value="issued" />
-                <button type="submit" class="text-slate-500 hover:text-slate-700 text-xs">{{t "invoices.mark_unpaid"}}</button>
+            {{if eq .Status "issued"}}
+              {{if .CanSend}}
+              <form method="post" action="/invoices/{{.Number}}/send" class="inline">
+                <button type="submit" class="text-indigo-600 hover:text-indigo-700 text-xs font-medium">{{t "invoices.send"}}</button>
               </form>
-            {{else if eq .Status "issued"}}
+              {{end}}
+              <form method="post" action="/invoices/{{.Number}}/status" class="inline">
+                <input type="hidden" name="status" value="sent" />
+                <button type="submit" class="text-slate-500 hover:text-slate-700 text-xs">{{t "invoices.mark_sent"}}</button>
+              </form>
+            {{else if eq .Status "sent"}}
               <form method="post" action="/invoices/{{.Number}}/status" class="inline">
                 <input type="hidden" name="status" value="paid" />
                 <button type="submit" class="text-teal-600 hover:text-teal-700 text-xs font-medium">{{t "invoices.mark_paid"}}</button>
               </form>
+              <form method="post" action="/invoices/{{.Number}}/status" class="inline">
+                <input type="hidden" name="status" value="issued" />
+                <button type="submit" class="text-slate-500 hover:text-slate-700 text-xs">{{t "invoices.mark_issued"}}</button>
+              </form>
+            {{else if eq .Status "paid"}}
+              <form method="post" action="/invoices/{{.Number}}/status" class="inline">
+                <input type="hidden" name="status" value="sent" />
+                <button type="submit" class="text-slate-500 hover:text-slate-700 text-xs">{{t "invoices.mark_sent_back"}}</button>
+              </form>
             {{end}}
             {{if .PDFPath}}<a href="/invoices/{{.Number}}/pdf" target="_blank" rel="noopener" class="text-teal-600 hover:underline text-xs">{{t "invoices.open_pdf"}}</a>{{end}}
+            {{if or (eq .Status "pending_pdf") (eq .Status "issued")}}
+              <form method="post" action="/invoices/{{.Number}}/delete" class="inline"
+                    onsubmit="return confirm('{{t "invoices.delete_confirm"}}');">
+                <button type="submit" class="text-rose-600 hover:text-rose-700 text-xs">{{t "invoices.delete"}}</button>
+              </form>
+            {{end}}
           </div>
         </td>
       </tr>

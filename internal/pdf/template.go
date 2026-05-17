@@ -29,7 +29,7 @@ func Render(outDir string, coach store.Coach, fa store.Finanzamt, athlete store.
 		WithTopMargin(15).
 		WithBottomMargin(15).
 		WithAuthor("coachly", true).
-		WithTitle(fmt.Sprintf("Rechnung %d", inv.Number), true).
+		WithTitle(fmt.Sprintf("Rechnung %s", displayNumber(inv)), true).
 		Build()
 	m := maroto.New(cfg)
 
@@ -51,12 +51,22 @@ func Render(outDir string, coach store.Coach, fa store.Finanzamt, athlete store.
 	}
 	month := monthFromString(inv.Month)
 	year := yearFromString(inv.Month)
-	name := invoice.PDFFilename(athlete.FirstName, year, month, inv.Number)
+	name := invoice.PDFFilename(athlete.FirstName, year, month, inv.DisplayNumber)
 	full := filepath.Join(outDir, name)
 	if err := doc.Save(full); err != nil {
 		return "", err
 	}
 	return full, nil
+}
+
+// displayNumber renders the invoice's human-readable identifier, falling
+// back to the integer Number for any invoice whose DisplayNumber is unset
+// (e.g. drafts built before migration to schema v2 inside the same run).
+func displayNumber(inv store.Invoice) string {
+	if inv.DisplayNumber != "" {
+		return inv.DisplayNumber
+	}
+	return fmt.Sprintf("%d", inv.Number)
 }
 
 func boldText(content string, size float64) core.Col {
@@ -70,7 +80,7 @@ func plainText(content string, size float64) core.Col {
 func addHeader(m core.Maroto, inv store.Invoice) {
 	m.AddRow(14,
 		text.NewCol(8, "Rechnung", props.Text{Size: 22, Style: fontstyle.Bold, Align: align.Left}),
-		text.NewCol(4, fmt.Sprintf("Nr. %d", inv.Number), props.Text{Size: 12, Style: fontstyle.Bold, Align: align.Right, Top: 6}),
+		text.NewCol(4, fmt.Sprintf("Nr. %s", displayNumber(inv)), props.Text{Size: 12, Style: fontstyle.Bold, Align: align.Right, Top: 6}),
 	)
 	m.AddRow(2)
 }
@@ -108,7 +118,7 @@ func addAddresses(m core.Maroto, coach store.Coach, fa store.Finanzamt, a store.
 func addMeta(m core.Maroto, coach store.Coach, inv store.Invoice) {
 	meta := [][2]string{
 		{"Datum:", inv.IssuedAt.Format("02.01.2006")},
-		{"Rechnungsnummer:", fmt.Sprintf("%d", inv.Number)},
+		{"Rechnungsnummer:", displayNumber(inv)},
 		{"Steuernummer:", coach.Steuernummer},
 		{"UID:", coach.UID},
 	}
