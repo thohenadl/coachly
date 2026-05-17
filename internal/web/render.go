@@ -40,6 +40,7 @@ func defaultNav() []navItem {
 		{"athletes", i18n.T("nav.athletes"), "/athletes"},
 		{"invoices", i18n.T("nav.invoices"), "/invoices"},
 		{"reports", i18n.T("nav.reports"), "/reports"},
+		{"documentation", i18n.T("nav.documentation"), "/documentation"},
 		{"settings", i18n.T("nav.settings"), "/settings"},
 	}
 }

@@ -8,7 +8,6 @@ var de = map[string]string{
 	"app.tagline":         "Coaching-Verwaltung & Rechnungsstellung",
 	"app.greeting":        "Willkommen zurück, Coach!",
 	"app.subgreeting":     "Hier ist die heutige Übersicht deiner Athleten.",
-	"app.search":          "Suchen…",
 	"app.logout":          "Abmelden",
 	"app.save":            "Speichern",
 	"app.cancel":          "Abbrechen",
@@ -20,11 +19,12 @@ var de = map[string]string{
 	"app.next":            "Weiter",
 
 	// Navigation
-	"nav.dashboard": "Dashboard",
-	"nav.athletes":  "Athleten",
-	"nav.invoices":  "Rechnungen",
-	"nav.reports":   "Auswertungen",
-	"nav.settings":  "Einstellungen",
+	"nav.dashboard":     "Dashboard",
+	"nav.athletes":      "Athleten",
+	"nav.invoices":      "Rechnungen",
+	"nav.reports":       "Auswertungen",
+	"nav.documentation": "Dokumentation",
+	"nav.settings":      "Einstellungen",
 
 	// Auth
 	"auth.welcome":            "Willkommen bei coachly",
@@ -74,6 +74,16 @@ var de = map[string]string{
 	"athletes.filter.status": "Status",
 	"athletes.filter.apply":  "Filtern",
 	"athletes.empty":         "Noch keine Athleten angelegt.",
+
+	// Athlete detail — invoice section + delete guard
+	"athletes.invoices_title":      "Rechnungen dieses Athleten",
+	"athletes.invoices_open":       "Offen",
+	"athletes.invoices_open_amount": "Offener Betrag",
+	"athletes.invoices_view_all":   "Alle Rechnungen anzeigen",
+	"athletes.invoices_empty":      "Noch keine Rechnungen für diesen Athleten.",
+	"athletes.delete_confirm":      "Diesen Athleten wirklich löschen? Bestehende Rechnungen bleiben erhalten.",
+	"athletes.delete_blocked":      "Löschen nicht möglich – für diesen Athleten existieren noch Rechnungen.",
+	"athletes.err_has_invoices":    "Athlet kann nicht gelöscht werden, da noch Rechnungen für ihn existieren.",
 
 	// Bulk athlete CSV import
 	"athletes.import.title":           "CSV-Import",
@@ -271,6 +281,71 @@ var de = map[string]string{
 	"settings.storage.pick":              "Ordner auswählen…",
 	"settings.storage.pick_prompt":       "Ordner für Rechnungs-PDFs wählen",
 	"settings.storage.pick_unavailable":  "Der System-Ordnerdialog steht hier nicht zur Verfügung. Bitte den Pfad manuell eingeben.",
+
+	// Documentation page
+	"docs.title":     "Dokumentation",
+	"docs.subtitle":  "Was du wo findest — mit Screenshots aus coachly.",
+	"docs.open_page": "Zur Seite öffnen →",
+
+	"docs.toc.dashboard": "Dashboard",
+	"docs.toc.athletes":  "Athleten",
+	"docs.toc.invoices":  "Rechnungen",
+	"docs.toc.reports":   "Auswertungen",
+	"docs.toc.settings":  "Einstellungen",
+
+	"docs.dashboard.overview.title": "Übersicht",
+	"docs.dashboard.overview.body":  "Das Dashboard begrüßt dich nach dem Anmelden. Oben siehst du auf einen Blick die wichtigsten Zahlen des aktuellen Monats: Umsatz, offene und bezahlte Beträge sowie die Anzahl deiner aktiven Athleten. Darunter findest du die zuletzt erstellten Rechnungen und ein farbiges Ringdiagramm, das dir zeigt, wie viele Rechnungen gerade welchen Status haben.",
+
+	"docs.athletes.list.title": "Athleten-Übersicht",
+	"docs.athletes.list.body":  "Hier findest du alle deine Athleten in einer Liste. Du kannst nach Namen suchen und nach Status filtern (aktiv oder inaktiv). Über einen Klick auf einen Namen kommst du zur Detailansicht, oben rechts legst du über „Athlet hinzufügen“ einen neuen Athleten an.",
+
+	"docs.athletes.details.title": "Detailansicht",
+	"docs.athletes.details.body":  "Die Detailseite zeigt alle gespeicherten Daten eines Athleten: Adresse, E-Mail, monatliche Gebühr, Start- und Ende-Datum des Coachings sowie persönliche Notizen. Direkt darunter siehst du alle Rechnungen, die für diesen Athleten bereits erstellt wurden, mit dem offenen Gesamtbetrag.",
+
+	"docs.athletes.new.title": "Neuen Athleten anlegen",
+	"docs.athletes.new.body":  "Über das Formular trägst du einen neuen Athleten manuell ein. Pflichtfelder sind Vor- und Nachname, E-Mail und die monatliche Gebühr in Euro. Optional kannst du ein Ende-Datum setzen, falls das Coaching zeitlich begrenzt ist, und Notizen ergänzen.",
+
+	"docs.athletes.import.title": "Mehrere Athleten gleichzeitig importieren",
+	"docs.athletes.import.body":  "Wenn du viele Athleten auf einmal übernehmen möchtest, kannst du sie aus einer Tabelle (CSV-Datei) hochladen. Den Import findest du unter „Einstellungen → Daten → Athleten per CSV importieren“. Vor dem Speichern siehst du eine Vorschau und kannst bei Konflikten Zeile für Zeile entscheiden, ob bestehende Daten überschrieben werden.",
+
+	"docs.invoices.list.title": "Rechnungs-Übersicht",
+	"docs.invoices.list.body":  "Die Übersicht listet alle erstellten Rechnungen mit Nummer, Athlet, Zeitraum, Betrag und Status (Entwurf, Erstellt, Versendet, Bezahlt). Du kannst nach Status, Athlet, Monat oder Stichwort filtern. Pro Rechnung kannst du das PDF öffnen, den Status ändern oder die Rechnung versenden bzw. löschen.",
+
+	"docs.invoices.single.title": "Einzelne Rechnung erzeugen",
+	"docs.invoices.single.body":  "Für eine einzelne Rechnung wählst du Monat und Athlet aus. Existiert für diesen Athleten in diesem Monat schon eine Rechnung, weist coachly dich darauf hin und du kannst entscheiden, ob du sie mit derselben Nummer neu erstellen möchtest. Optional fügst du einen persönlichen Tipp hinzu, der unten auf der Rechnung erscheint.",
+
+	"docs.invoices.multi.title": "Sammelrechnungen erzeugen",
+	"docs.invoices.multi.body":  "Für die Monatsabrechnung erstellst du alle Rechnungen auf einmal: Du wählst den Abrechnungsmonat und optional einen Tipp, der für alle Rechnungen gilt. coachly schlägt dir dann pro aktivem Athleten eine Rechnung vor und zeigt eine Vorschau, in der du jede Rechnung einzeln durchklicken und prüfen kannst, bevor sie endgültig erstellt wird.",
+
+	"docs.invoices.preview.title": "PDF-Vorschau",
+	"docs.invoices.preview.body":  "Bevor Rechnungen final erzeugt werden, zeigt dir coachly eine Vorschau der fertigen Rechnung — genau so, wie sie später als PDF gespeichert und an den Athleten verschickt wird. Erst mit „Alle bestätigen & PDF erzeugen“ werden die PDFs angelegt und die Rechnungsnummern vergeben.",
+
+	"docs.reports.overview.title": "Auswertungen",
+	"docs.reports.overview.body":  "Die Auswertungen zeigen dir deine Umsätze auf einen Blick: den Umsatz des aktuellen Monats, den Gesamtumsatz seit Beginn und den aufsummierten Umsatz des laufenden Jahres. So bekommst du schnell ein Gefühl dafür, wie dein Coaching-Jahr läuft.",
+
+	"docs.settings.coach.title": "Coach-Stammdaten",
+	"docs.settings.coach.body":  "Hier hinterlegst du deine eigenen Daten als Coach: Name, Adresse, E-Mail und Bankverbindung. Diese Angaben erscheinen auf jeder Rechnung, die du erstellst. Trag sie einmal ein und vergiss sie — coachly nimmt sie ab dann automatisch.",
+
+	"docs.settings.tax.title": "Finanzamt, Team & Steuer",
+	"docs.settings.tax.body":  "In diesem Bereich pflegst du Angaben rund um Steuern: zuständiges Finanzamt, Steuernummer und gegebenenfalls Team-Angaben. Diese Daten landen ebenfalls auf der Rechnung und sind wichtig für die korrekte steuerliche Zuordnung.",
+
+	"docs.settings.format.title": "Rechnungsnummer-Format",
+	"docs.settings.format.body":  "Hier legst du fest, wie deine Rechnungsnummern aussehen sollen, zum Beispiel „2026001“. Du baust das Format aus Bausteinen wie Jahr, Monat und laufender Nummer zusammen und siehst sofort eine Vorschau, wie die nächste Rechnung heißen wird. Das Format gilt nur für neue Rechnungen — bereits erstellte Nummern bleiben unverändert.",
+
+	"docs.settings.email_account.title": "E-Mail-Postfach",
+	"docs.settings.email_account.body":  "Damit coachly Rechnungen direkt per E-Mail an deine Athleten verschicken kann, trägst du hier die Zugangsdaten deines Postfachs ein (technisch nennt man das SMTP). Über „Test senden“ kannst du sofort prüfen, ob alles funktioniert, ohne extra speichern zu müssen.",
+
+	"docs.settings.email_text.title": "E-Mail-Text",
+	"docs.settings.email_text.body":  "Hier legst du Betreff und Text der E-Mail fest, mit der die Rechnung als Anhang verschickt wird. Über Platzhalter wie {Vorname} oder {Nummer} kannst du Texte persönlich gestalten — die echten Werte werden beim Versenden automatisch eingesetzt.",
+
+	"docs.settings.storage.title": "Speicherort für Rechnungs-PDFs",
+	"docs.settings.storage.body":  "Standardmäßig speichert coachly alle erzeugten Rechnungs-PDFs im eigenen Datenordner. Wenn du sie lieber an einer anderen Stelle ablegen möchtest — zum Beispiel in einem Cloud-Ordner —, kannst du den Pfad hier eintragen. Bereits vorhandene PDFs bleiben am alten Ort; nur neue Rechnungen landen im neuen Ordner.",
+
+	"docs.settings.password.title": "Passwort ändern",
+	"docs.settings.password.body":  "Dein Master-Passwort schützt alle Daten in coachly. Hier kannst du es jederzeit ändern — du brauchst dafür dein aktuelles Passwort und ein neues. Achtung: Das Passwort kann nicht wiederhergestellt werden, bewahre es also sicher auf.",
+
+	"docs.settings.data.title": "Daten exportieren und importieren",
+	"docs.settings.data.body":  "Im Daten-Bereich kannst du alle Inhalte (Athleten, Rechnungen, Einstellungen) als Sicherungs-Datei herunterladen oder eine zuvor gespeicherte Datei wieder einspielen. Zusätzlich findest du hier den CSV-Import für Athleten und einen Knopf, mit dem du alle Daten unwiderruflich löschen kannst — bitte vorher unbedingt einen Export anlegen.",
 
 	// Months
 	"month.1":  "Januar",

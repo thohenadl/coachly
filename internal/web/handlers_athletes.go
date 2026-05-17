@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -61,14 +62,29 @@ func (s *Server) handleAthletes(w http.ResponseWriter, r *http.Request) {
 }
 
 type athleteFormVM struct {
-	A            store.Athlete
-	FeeStr       string
-	StartStr     string
-	EndStr       string
-	Action       string
-	DeleteAction string
-	ShowDelete   bool
-	Error        string
+	A               store.Athlete
+	FeeStr          string
+	StartStr        string
+	EndStr          string
+	Action          string
+	DeleteAction    string
+	ShowDelete      bool
+	HasInvoices     bool
+	Invoices        []athleteInvoiceRow
+	OpenCount       int
+	OpenAmount      string
+	InvoicesListURL string
+	Error           string
+}
+
+type athleteInvoiceRow struct {
+	Number      int
+	Display     string
+	Period      string
+	Amount      string
+	StatusClass string
+	StatusLabel string
+	PDFPath     string
 }
 
 func (s *Server) handleAthleteForm(w http.ResponseWriter, r *http.Request) {
@@ -90,6 +106,31 @@ func (s *Server) handleAthleteForm(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
+
+		var open store.Money
+		for _, inv := range d.Invoices {
+			if inv.AthleteID != id {
+				continue
+			}
+			cls, lbl := statusBadge(inv.Status)
+			vm.Invoices = append(vm.Invoices, athleteInvoiceRow{
+				Number:      inv.Number,
+				Display:     displayNumberFallback(inv),
+				Period:      fmt.Sprintf("%s – %s", inv.PeriodFrom.Format("02.01.2006"), inv.PeriodTo.Format("02.01.2006")),
+				Amount:      invoice.FormatEUR(inv.Amount),
+				StatusClass: cls,
+				StatusLabel: lbl,
+				PDFPath:     inv.PDFPath,
+			})
+			if inv.Status == store.StatusIssued || inv.Status == store.StatusSent {
+				vm.OpenCount++
+				open += inv.Amount
+			}
+		}
+		sort.Slice(vm.Invoices, func(i, j int) bool { return vm.Invoices[i].Number > vm.Invoices[j].Number })
+		vm.HasInvoices = len(vm.Invoices) > 0
+		vm.OpenAmount = invoice.FormatEUR(open)
+		vm.InvoicesListURL = "/invoices?athlete=" + id
 	}
 	v := s.chrome("athletes", i18n.T("athletes.add"), "")
 	v["A"] = vm.A
@@ -99,6 +140,11 @@ func (s *Server) handleAthleteForm(w http.ResponseWriter, r *http.Request) {
 	v["Action"] = vm.Action
 	v["DeleteAction"] = vm.DeleteAction
 	v["ShowDelete"] = vm.ShowDelete
+	v["HasInvoices"] = vm.HasInvoices
+	v["Invoices"] = vm.Invoices
+	v["OpenCount"] = vm.OpenCount
+	v["OpenAmount"] = vm.OpenAmount
+	v["InvoicesListURL"] = vm.InvoicesListURL
 	v["Error"] = vm.Error
 	s.renderPage(w, "athlete_form.html", v)
 }
@@ -144,7 +190,13 @@ func (s *Server) handleAthleteUpdate(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleAthleteDelete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	if err := s.Store.Mutate(func(d *store.Data) error {
+	errHasInvoices := fmt.Errorf("athlete has invoices")
+	err := s.Store.Mutate(func(d *store.Data) error {
+		for _, inv := range d.Invoices {
+			if inv.AthleteID == id {
+				return errHasInvoices
+			}
+		}
 		out := d.Athletes[:0]
 		for _, a := range d.Athletes {
 			if a.ID != id {
@@ -153,7 +205,12 @@ func (s *Server) handleAthleteDelete(w http.ResponseWriter, r *http.Request) {
 		}
 		d.Athletes = out
 		return nil
-	}); err != nil {
+	})
+	if err == errHasInvoices {
+		http.Error(w, i18n.T("athletes.err_has_invoices"), http.StatusForbidden)
+		return
+	}
+	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}

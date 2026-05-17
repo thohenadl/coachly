@@ -27,7 +27,7 @@ import (
 	"coachly/internal/web"
 )
 
-//go:embed all:assets all:ui/dist
+//go:embed all:assets all:ui/dist all:internal/images
 var embedded embed.FS
 
 func main() {
@@ -50,8 +50,12 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	docsImagesFS, err := fs.Sub(embedded, "internal/images")
+	if err != nil {
+		return err
+	}
 
-	srv, err := web.NewServer(st, dataDir, invoicesDir, assetsFS)
+	srv, err := web.NewServer(st, dataDir, invoicesDir, assetsFS, docsImagesFS)
 	if err != nil {
 		return err
 	}

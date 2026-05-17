@@ -18,7 +18,7 @@ func TestNewServer_ParsesTemplates(t *testing.T) {
 	if err := s.Create([]byte("test-password-1234")); err != nil {
 		t.Fatalf("Create: %v", err)
 	}
-	if _, err := NewServer(s, dir, dir, nil); err != nil {
+	if _, err := NewServer(s, dir, dir, nil, nil); err != nil {
 		t.Fatalf("NewServer: %v", err)
 	}
 }
@@ -32,7 +32,7 @@ func TestRenderNewTemplates(t *testing.T) {
 	if err := s.Create([]byte("test-password-1234")); err != nil {
 		t.Fatalf("Create: %v", err)
 	}
-	srv, err := NewServer(s, dir, dir, nil)
+	srv, err := NewServer(s, dir, dir, nil, nil)
 	if err != nil {
 		t.Fatalf("NewServer: %v", err)
 	}

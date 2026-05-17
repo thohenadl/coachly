@@ -1,5 +1,10 @@
 {{define "content"}}
-<form method="post" action="{{.Action}}" class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl space-y-4">
+{{if and .ShowDelete (not .HasInvoices)}}
+<form id="del-form" method="post" action="{{.DeleteAction}}"
+      onsubmit="return confirm('{{t "athletes.delete_confirm"}}');" class="hidden"></form>
+{{end}}
+<div class="grid grid-cols-1 {{if .ShowDelete}}lg:grid-cols-2{{end}} gap-6 items-start">
+<form method="post" action="{{.Action}}" class="bg-white rounded-2xl shadow-sm p-6 w-full space-y-4">
   {{if .Error}}<div class="p-3 rounded-xl bg-rose-50 text-rose-700 text-sm">{{.Error}}</div>{{end}}
   <div class="grid grid-cols-2 gap-4">
     <div>
@@ -66,8 +71,12 @@
   </div>
   <div class="flex items-center justify-between pt-2">
     {{if .ShowDelete}}
-    <button form="del" type="submit" formaction="{{.DeleteAction}}" formmethod="post"
-            class="text-rose-600 hover:underline text-sm">{{t "app.delete"}}</button>
+      {{if .HasInvoices}}
+      <span class="text-xs text-slate-400" title="{{t "athletes.delete_blocked"}}">{{t "athletes.delete_blocked"}}</span>
+      {{else}}
+      <button type="submit" form="del-form"
+              class="text-rose-600 hover:underline text-sm">{{t "app.delete"}}</button>
+      {{end}}
     {{else}}<span></span>{{end}}
     <div class="flex gap-2">
       <a href="/athletes" class="rounded-full border border-slate-200 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
@@ -75,4 +84,60 @@
     </div>
   </div>
 </form>
+
+{{if .ShowDelete}}
+<section class="bg-white rounded-2xl shadow-sm p-6 w-full">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-base font-semibold text-slate-800">{{t "athletes.invoices_title"}}</h2>
+    {{if .Invoices}}
+    <a href="{{.InvoicesListURL}}" class="text-sm text-teal-600 hover:underline">{{t "athletes.invoices_view_all"}} →</a>
+    {{end}}
+  </div>
+
+  {{if .Invoices}}
+  <div class="grid grid-cols-2 gap-4 mb-4">
+    <div class="rounded-xl bg-slate-50 p-3">
+      <div class="text-xs text-slate-500">{{t "athletes.invoices_open"}}</div>
+      <div class="text-lg font-semibold text-slate-800">{{.OpenCount}}</div>
+    </div>
+    <div class="rounded-xl bg-slate-50 p-3">
+      <div class="text-xs text-slate-500">{{t "athletes.invoices_open_amount"}}</div>
+      <div class="text-lg font-semibold text-slate-800">{{.OpenAmount}}</div>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-slate-100">
+    <table class="w-full text-sm">
+      <thead class="text-xs uppercase text-slate-500 bg-slate-50">
+        <tr>
+          <th class="text-left p-2">{{t "invoices.number"}}</th>
+          <th class="text-left">{{t "invoices.period"}}</th>
+          <th class="text-right">{{t "invoices.amount"}}</th>
+          <th class="text-right">{{t "invoices.status"}}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Invoices}}
+        <tr class="border-t border-slate-100">
+          <td class="p-2 font-mono text-xs">{{.Display}}</td>
+          <td class="text-slate-500">{{.Period}}</td>
+          <td class="text-right font-medium">{{.Amount}}</td>
+          <td class="text-right">
+            <span class="inline-flex px-2 py-0.5 rounded-full text-xs {{.StatusClass}}">{{.StatusLabel}}</span>
+          </td>
+          <td class="p-2 text-right">
+            {{if .PDFPath}}<a href="/invoices/{{.Number}}/pdf" target="_blank" rel="noopener" class="text-teal-600 hover:underline text-xs">{{t "invoices.open_pdf"}}</a>{{end}}
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="text-sm text-slate-500">{{t "athletes.invoices_empty"}}</div>
+  {{end}}
+</section>
+{{end}}
+</div>
 {{end}}

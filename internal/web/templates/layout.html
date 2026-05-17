@@ -61,9 +61,7 @@
     {{if .PageSubtitle}}<p class="text-sm text-slate-500">{{.PageSubtitle}}</p>{{end}}
   </div>
   <div class="flex items-center gap-3">
-    <input type="search" placeholder="{{t "app.search"}}"
-           class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-teal-400" />
-    <div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold">{{.Initials}}</div>
+    <a href="/settings" class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200 flex items-center justify-center font-bold">{{.Initials}}</a>
   </div>
 </header>
 {{end}}

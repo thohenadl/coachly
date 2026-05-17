@@ -1,0 +1,220 @@
+{{define "content"}}
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+  <div class="lg:col-span-3 space-y-12">
+
+    <section id="dashboard" class="scroll-mt-20">
+      <h2 class="text-xl font-semibold mb-4">{{t "docs.toc.dashboard"}}</h2>
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.dashboard.overview.title"}}</h3>
+          <a href="/dashboard" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.dashboard.overview.body"}}</p>
+        <img src="/docs/img/dashboard.png" alt="{{t "docs.dashboard.overview.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+    </section>
+
+    <section id="athleten" class="scroll-mt-20">
+      <h2 class="text-xl font-semibold mb-4">{{t "docs.toc.athletes"}}</h2>
+
+      <div id="athleten-uebersicht" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.athletes.list.title"}}</h3>
+          <a href="/athletes" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.athletes.list.body"}}</p>
+        <img src="/docs/img/athletes.png" alt="{{t "docs.athletes.list.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="athleten-details" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.athletes.details.title"}}</h3>
+          <a href="/athletes" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.athletes.details.body"}}</p>
+        <img src="/docs/img/athletes_details.png" alt="{{t "docs.athletes.details.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="athleten-neu" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.athletes.new.title"}}</h3>
+          <a href="/athletes" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.athletes.new.body"}}</p>
+        <img src="/docs/img/new_athlete_form.png" alt="{{t "docs.athletes.new.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="athleten-import" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.athletes.import.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">{{t "docs.athletes.import.body"}}</p>
+      </div>
+    </section>
+
+    <section id="rechnungen" class="scroll-mt-20">
+      <h2 class="text-xl font-semibold mb-4">{{t "docs.toc.invoices"}}</h2>
+
+      <div id="rechnungen-uebersicht" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.invoices.list.title"}}</h3>
+          <a href="/invoices" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.invoices.list.body"}}</p>
+        <img src="/docs/img/invoices.png" alt="{{t "docs.invoices.list.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="rechnungen-einzel" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.invoices.single.title"}}</h3>
+          <a href="/invoices" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.invoices.single.body"}}</p>
+        <img src="/docs/img/invoice_new_single_invoice_form.png" alt="{{t "docs.invoices.single.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="rechnungen-sammel" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.invoices.multi.title"}}</h3>
+          <a href="/invoices" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.invoices.multi.body"}}</p>
+        <img src="/docs/img/invoice_new_multi_invoice_form.png" alt="{{t "docs.invoices.multi.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="rechnungen-vorschau" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.invoices.preview.title"}}</h3>
+          <a href="/invoices" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.invoices.preview.body"}}</p>
+        <img src="/docs/img/invoice_preview.png" alt="{{t "docs.invoices.preview.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+    </section>
+
+    <section id="auswertungen" class="scroll-mt-20">
+      <h2 class="text-xl font-semibold mb-4">{{t "docs.toc.reports"}}</h2>
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.reports.overview.title"}}</h3>
+          <a href="/reports" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.reports.overview.body"}}</p>
+        <img src="/docs/img/reporting.png" alt="{{t "docs.reports.overview.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+    </section>
+
+    <section id="einstellungen" class="scroll-mt-20">
+      <h2 class="text-xl font-semibold mb-4">{{t "docs.toc.settings"}}</h2>
+
+      <div id="einstellungen-coach" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.coach.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.coach.body"}}</p>
+        <img src="/docs/img/settings_coach.png" alt="{{t "docs.settings.coach.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-finanzamt" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.tax.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.tax.body"}}</p>
+        <img src="/docs/img/settings_tax_team.png" alt="{{t "docs.settings.tax.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-format" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.format.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.format.body"}}</p>
+        <img src="/docs/img/settings_invoice_format.png" alt="{{t "docs.settings.format.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-email-konto" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.email_account.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.email_account.body"}}</p>
+        <img src="/docs/img/settings_email_account.png" alt="{{t "docs.settings.email_account.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-email-text" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.email_text.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.email_text.body"}}</p>
+        <img src="/docs/img/settings_email_text.png" alt="{{t "docs.settings.email_text.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-speicherort" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.storage.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.storage.body"}}</p>
+        <img src="/docs/img/settings_storage_location.png" alt="{{t "docs.settings.storage.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-passwort" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.password.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.password.body"}}</p>
+        <img src="/docs/img/settings_password.png" alt="{{t "docs.settings.password.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+
+      <div id="einstellungen-daten" class="scroll-mt-20 bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-lg font-semibold">{{t "docs.settings.data.title"}}</h3>
+          <a href="/settings" class="shrink-0 text-sm text-teal-600 hover:text-teal-700 hover:underline">{{t "docs.open_page"}}</a>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">{{t "docs.settings.data.body"}}</p>
+        <img src="/docs/img/settings_data_exportImport.png" alt="{{t "docs.settings.data.title"}}" class="w-1/2 rounded-xl border border-slate-200 shadow-sm">
+      </div>
+    </section>
+
+  </div>
+
+  <aside class="hidden lg:block lg:col-span-1">
+    <nav class="sticky top-6 bg-white rounded-2xl p-5 shadow-sm text-sm max-h-[calc(100vh-3rem)] overflow-y-auto">
+      <div class="font-semibold text-slate-500 uppercase text-xs tracking-wide mb-2">{{t "docs.toc.dashboard"}}</div>
+      <a href="#dashboard" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.dashboard.overview.title"}}</a>
+
+      <div class="font-semibold text-slate-500 uppercase text-xs tracking-wide mt-4 mb-2">{{t "docs.toc.athletes"}}</div>
+      <a href="#athleten-uebersicht" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.athletes.list.title"}}</a>
+      <a href="#athleten-details" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.athletes.details.title"}}</a>
+      <a href="#athleten-neu" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.athletes.new.title"}}</a>
+      <a href="#athleten-import" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.athletes.import.title"}}</a>
+
+      <div class="font-semibold text-slate-500 uppercase text-xs tracking-wide mt-4 mb-2">{{t "docs.toc.invoices"}}</div>
+      <a href="#rechnungen-uebersicht" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.invoices.list.title"}}</a>
+      <a href="#rechnungen-einzel" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.invoices.single.title"}}</a>
+      <a href="#rechnungen-sammel" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.invoices.multi.title"}}</a>
+      <a href="#rechnungen-vorschau" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.invoices.preview.title"}}</a>
+
+      <div class="font-semibold text-slate-500 uppercase text-xs tracking-wide mt-4 mb-2">{{t "docs.toc.reports"}}</div>
+      <a href="#auswertungen" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.reports.overview.title"}}</a>
+
+      <div class="font-semibold text-slate-500 uppercase text-xs tracking-wide mt-4 mb-2">{{t "docs.toc.settings"}}</div>
+      <a href="#einstellungen-coach" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.coach.title"}}</a>
+      <a href="#einstellungen-finanzamt" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.tax.title"}}</a>
+      <a href="#einstellungen-format" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.format.title"}}</a>
+      <a href="#einstellungen-email-konto" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.email_account.title"}}</a>
+      <a href="#einstellungen-email-text" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.email_text.title"}}</a>
+      <a href="#einstellungen-speicherort" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.storage.title"}}</a>
+      <a href="#einstellungen-passwort" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.password.title"}}</a>
+      <a href="#einstellungen-daten" class="block py-1 text-slate-700 hover:text-teal-600">{{t "docs.settings.data.title"}}</a>
+    </nav>
+  </aside>
+
+</div>
+{{end}}

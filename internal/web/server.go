@@ -17,11 +17,12 @@ import (
 
 // AssetsFS is set by main.go to the embedded UI assets (CSS + vendored JS).
 type Server struct {
-	Store       *store.Store
-	DataDir     string
-	InvoicesDir string
-	AssetsFS    fs.FS
-	tmpl        *template.Template
+	Store        *store.Store
+	DataDir      string
+	InvoicesDir  string
+	AssetsFS     fs.FS
+	DocsImagesFS fs.FS
+	tmpl         *template.Template
 
 	mu       sync.Mutex
 	sessions map[string]time.Time
@@ -39,7 +40,7 @@ type Batch struct {
 	CreatedAt time.Time
 }
 
-func NewServer(s *store.Store, dataDir, invoicesDir string, assets fs.FS) (*Server, error) {
+func NewServer(s *store.Store, dataDir, invoicesDir string, assets, docsImages fs.FS) (*Server, error) {
 	tmpl, err := template.New("").
 		Funcs(templateFuncs).
 		ParseFS(templates.FS, "*.html")
@@ -47,11 +48,12 @@ func NewServer(s *store.Store, dataDir, invoicesDir string, assets fs.FS) (*Serv
 		return nil, err
 	}
 	return &Server{
-		Store:       s,
-		DataDir:     dataDir,
-		InvoicesDir: invoicesDir,
-		AssetsFS:    assets,
-		tmpl:        tmpl,
+		Store:        s,
+		DataDir:      dataDir,
+		InvoicesDir:  invoicesDir,
+		AssetsFS:     assets,
+		DocsImagesFS: docsImages,
+		tmpl:         tmpl,
 		sessions:              map[string]time.Time{},
 		batches:               map[string]*Batch{},
 		pendingImports:        map[string]store.Data{},
@@ -72,6 +74,11 @@ func (s *Server) Routes() http.Handler {
 		r.Use(s.requireAuth)
 		r.Get("/", s.handleDashboard)
 		r.Get("/dashboard", s.handleDashboard)
+
+		r.Get("/documentation", s.handleDocumentation)
+		if s.DocsImagesFS != nil {
+			r.Handle("/docs/img/*", http.StripPrefix("/docs/img/", http.FileServer(http.FS(s.DocsImagesFS))))
+		}
 
 		r.Get("/athletes", s.handleAthletes)
 		r.Get("/athletes/new", s.handleAthleteForm)

@@ -33,7 +33,7 @@
     <tbody>
       {{range .Athletes}}
       <tr class="border-t border-slate-100 hover:bg-slate-50">
-        <td class="p-3 font-medium">{{.Name}}</td>
+        <td class="p-3 font-medium"><a href="/athletes/{{.ID}}/edit" class="text-teal-600 hover:text-teal-700 hover:underline">{{.Name}}</a></td>
         <td class="text-slate-600">{{.City}}</td>
         <td class="text-slate-500">{{.StartDate}}</td>
         <td class="text-right font-medium">{{.Fee}}</td>
