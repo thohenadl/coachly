@@ -1,0 +1,45 @@
+{{define "content"}}
+<div class="bg-white rounded-2xl shadow-sm p-6">
+  <p class="text-sm text-slate-500 mb-4">{{t "invoices.preview_desc"}}</p>
+
+  <div x-data="{ i: 0, n: {{len .Drafts}} }" class="space-y-4">
+    {{range $i, $d := .Drafts}}
+    <div x-show="i === {{$i}}" class="border border-slate-200 rounded-2xl p-6">
+      <div class="flex justify-between mb-4">
+        <div>
+          <div class="text-xs text-slate-500">{{t "invoices.athlete"}}</div>
+          <div class="font-semibold">{{$d.Athlete}}</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-slate-500">{{t "invoices.number"}}</div>
+          <div class="font-mono">{{$d.Number}}</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><span class="text-slate-500">{{t "invoices.period"}}:</span> {{$d.Period}}</div>
+        <div class="text-right"><span class="text-slate-500">{{t "invoices.amount"}}:</span> <span class="font-semibold">{{$d.Amount}}</span></div>
+      </div>
+      {{if $d.Tipp}}
+      <div class="mt-4 p-3 rounded-xl bg-teal-50 text-teal-900 text-sm italic">"{{$d.Tipp}}"</div>
+      {{end}}
+    </div>
+    {{end}}
+
+    <div class="flex items-center justify-between">
+      <button @click="i = Math.max(0, i-1)" :disabled="i === 0"
+              class="rounded-full border border-slate-200 px-4 py-2 text-sm disabled:opacity-40">← {{t "app.back"}}</button>
+      <div class="text-sm text-slate-500"><span x-text="i+1"></span> / <span x-text="n"></span></div>
+      <button @click="i = Math.min(n-1, i+1)" :disabled="i === n-1"
+              class="rounded-full border border-slate-200 px-4 py-2 text-sm disabled:opacity-40">{{t "app.next"}} →</button>
+    </div>
+
+    <form method="post" action="/invoices/confirm" class="flex justify-end pt-2">
+      <input type="hidden" name="batch_id" value="{{.BatchID}}" />
+      <button type="submit"
+              class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-6 py-2.5 text-sm">
+        {{t "invoices.confirm_all"}}
+      </button>
+    </form>
+  </div>
+</div>
+{{end}}

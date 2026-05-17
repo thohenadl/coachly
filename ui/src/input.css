@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@source "../../internal/web/templates/**/*.html";
+
+@theme {
+  --color-brand-50:  #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --radius-3xl: 1.5rem;
+}
+
+[x-cloak] { display: none !important; }

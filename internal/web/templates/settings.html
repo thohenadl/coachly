@@ -1,0 +1,72 @@
+{{define "content"}}
+<div x-data="{ tab: '{{.ActiveTab}}' }" class="bg-white rounded-2xl shadow-sm p-6 max-w-3xl">
+  {{if .Saved}}<div class="mb-4 p-3 rounded-xl bg-teal-50 text-teal-700 text-sm">✓ {{t "app.save"}}</div>{{end}}
+  {{if .Error}}<div class="mb-4 p-3 rounded-xl bg-rose-50 text-rose-700 text-sm">{{.Error}}</div>{{end}}
+
+  <div class="flex gap-2 border-b border-slate-100 mb-6 text-sm">
+    <button @click="tab='coach'"     :class="tab==='coach'     ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.coach"}}</button>
+    <button @click="tab='finanzamt'" :class="tab==='finanzamt' ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.finanzamt"}}</button>
+    <button @click="tab='smtp'"      :class="tab==='smtp'      ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.smtp"}}</button>
+    <button @click="tab='password'"  :class="tab==='password'  ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.password"}}</button>
+  </div>
+
+  <div x-show="tab==='coach'">
+    <form method="post" action="/settings/coach" class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-600">Vorname</label><input name="first_name" value="{{.Coach.FirstName}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">Nachname</label><input name="last_name" value="{{.Coach.LastName}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      </div>
+      <div><label class="text-xs text-slate-600">Straße</label><input name="street" value="{{.Coach.Address.Street}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div class="grid grid-cols-3 gap-3">
+        <div><label class="text-xs text-slate-600">PLZ</label><input name="postal_code" value="{{.Coach.Address.PostalCode}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div class="col-span-2"><label class="text-xs text-slate-600">Ort</label><input name="city" value="{{.Coach.Address.City}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      </div>
+      <div><label class="text-xs text-slate-600">Land</label><input name="country" value="{{.Coach.Address.Country}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-600">Bank</label><input name="bank" value="{{.Coach.Bank}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">Kontoinhaber</label><input name="account_owner" value="{{.Coach.AccountOwner}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">IBAN</label><input name="iban" value="{{.Coach.IBAN}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm" /></div>
+        <div><label class="text-xs text-slate-600">BIC</label><input name="bic" value="{{.Coach.BIC}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm" /></div>
+        <div><label class="text-xs text-slate-600">Steuernummer</label><input name="steuernummer" value="{{.Coach.Steuernummer}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">UID</label><input name="uid" value="{{.Coach.UID}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      </div>
+      <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
+    </form>
+  </div>
+
+  <div x-show="tab==='finanzamt'" x-cloak>
+    <form method="post" action="/settings/finanzamt" class="space-y-3">
+      <div><label class="text-xs text-slate-600">Name</label><input name="name" value="{{.Finanzamt.Name}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div><label class="text-xs text-slate-600">Straße</label><input name="street" value="{{.Finanzamt.Address.Street}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div class="grid grid-cols-3 gap-3">
+        <div><label class="text-xs text-slate-600">PLZ</label><input name="postal_code" value="{{.Finanzamt.Address.PostalCode}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div class="col-span-2"><label class="text-xs text-slate-600">Ort</label><input name="city" value="{{.Finanzamt.Address.City}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      </div>
+      <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
+    </form>
+  </div>
+
+  <div x-show="tab==='smtp'" x-cloak>
+    <div class="p-3 rounded-xl bg-amber-50 text-amber-800 text-sm mb-4">{{t "settings.smtp.disabled_note"}}</div>
+    <form method="post" action="/settings/smtp" class="space-y-3 opacity-70">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-600">Host</label><input name="host" value="{{.SMTP.Host}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">Port</label><input name="port" type="number" value="{{.SMTP.Port}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">User</label><input name="user" value="{{.SMTP.User}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div><label class="text-xs text-slate-600">Passwort</label><input name="password" type="password" value="{{.SMTP.Password}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+        <div class="col-span-2"><label class="text-xs text-slate-600">Absender (From)</label><input name="from" value="{{.SMTP.From}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      </div>
+      <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
+    </form>
+  </div>
+
+  <div x-show="tab==='password'" x-cloak>
+    <form method="post" action="/settings/password" class="space-y-3 max-w-md">
+      <div><label class="text-xs text-slate-600">{{t "settings.password_current"}}</label><input name="current" type="password" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div><label class="text-xs text-slate-600">{{t "settings.password_new"}}</label><input name="new" type="password" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div><label class="text-xs text-slate-600">{{t "auth.password_repeat"}}</label><input name="new_repeat" type="password" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+      <div class="flex justify-end pt-2"><button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button></div>
+    </form>
+  </div>
+</div>
+{{end}}

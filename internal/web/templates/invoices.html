@@ -1,0 +1,41 @@
+{{define "content"}}
+<div class="flex items-center justify-between mb-4">
+  <div></div>
+  <a href="/invoices/new" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">+ {{t "invoices.create"}}</a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  {{if .Invoices}}
+  <table class="w-full text-sm">
+    <thead class="text-xs uppercase text-slate-500 bg-slate-50">
+      <tr>
+        <th class="text-left p-3">{{t "invoices.number"}}</th>
+        <th class="text-left">{{t "invoices.athlete"}}</th>
+        <th class="text-left">{{t "invoices.period"}}</th>
+        <th class="text-right">{{t "invoices.amount"}}</th>
+        <th class="text-right">{{t "invoices.status"}}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Invoices}}
+      <tr class="border-t border-slate-100 hover:bg-slate-50">
+        <td class="p-3 font-mono text-xs">{{.Number}}</td>
+        <td>{{.Athlete}}</td>
+        <td class="text-slate-500">{{.Period}}</td>
+        <td class="text-right font-medium">{{.Amount}}</td>
+        <td class="text-right">
+          <span class="inline-flex px-2 py-0.5 rounded-full text-xs {{.StatusClass}}">{{.StatusLabel}}</span>
+        </td>
+        <td class="p-3 text-right">
+          {{if .PDFPath}}<a href="/invoices/{{.Number}}/pdf" class="text-teal-600 hover:underline text-xs">{{t "invoices.open_pdf"}}</a>{{end}}
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{else}}
+  <div class="p-10 text-center text-slate-500 text-sm">{{t "invoices.empty"}}</div>
+  {{end}}
+</div>
+{{end}}

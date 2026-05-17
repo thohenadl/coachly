@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go run:*)",
+      "Bash(go mod:*)",
+      "Bash(go vet:*)",
+      "Bash(go fmt:*)",
+      "Bash(go env:*)",
+      "Bash(go version)",
+      "Bash(go install:*)",
+      "Bash(./scripts/tailwind.sh:*)",
+      "Bash(./scripts/build-mac.sh:*)",
+      "Bash(./scripts/build-win.sh:*)",
+      "Bash(./bin/tailwindcss:*)",
+      "Bash(curl -fsSL https://github.com/tailwindlabs/tailwindcss/*)",
+      "Bash(curl -fsSL https://unpkg.com/htmx.org*)",
+      "Bash(curl -fsSL https://unpkg.com/alpinejs*)",
+      "Bash(curl -fsSL https://cdn.jsdelivr.net/npm/chart.js*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(rm -rf /Users/*/Library/Application Support/coachly*)",
+      "Bash(rm -rf /Users/*/Library/Application\\ Support/coachly*)"
+    ]
+  }
+}

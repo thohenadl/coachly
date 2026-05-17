@@ -1,2 +1,22 @@
-.requirements
-.requirements/*
+# Build output
+/dist/
+/bin/
+/ui/dist/
+
+# Local data (never commit — contains encrypted user data)
+/data/
+*.enc
+
+# Generated PDFs
+*.pdf
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Go
+*.test
+*.out
+/coverage.out

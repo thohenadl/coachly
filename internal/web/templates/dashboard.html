@@ -1,0 +1,77 @@
+{{define "content"}}
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  {{range .KPIs}}
+  <div class="bg-white rounded-2xl p-5 shadow-sm">
+    <div class="text-xs uppercase tracking-wide text-slate-500">{{.Label}}</div>
+    <div class="text-2xl font-semibold mt-2">{{.Value}}</div>
+    {{if .Sub}}<div class="text-xs text-slate-400 mt-1">{{.Sub}}</div>{{end}}
+  </div>
+  {{end}}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <div class="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold">{{t "dash.recent_invoices"}}</h2>
+      <a href="/invoices" class="text-sm text-teal-600 hover:underline">{{t "dash.view_all"}}</a>
+    </div>
+    {{if .RecentInvoices}}
+    <table class="w-full text-sm">
+      <thead class="text-xs uppercase text-slate-500">
+        <tr>
+          <th class="text-left py-2">{{t "invoices.number"}}</th>
+          <th class="text-left">{{t "invoices.athlete"}}</th>
+          <th class="text-left">{{t "invoices.issued_at"}}</th>
+          <th class="text-right">{{t "invoices.amount"}}</th>
+          <th class="text-right">{{t "invoices.status"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .RecentInvoices}}
+        <tr class="border-t border-slate-100">
+          <td class="py-3 font-mono text-xs">{{.Number}}</td>
+          <td>{{.Athlete}}</td>
+          <td class="text-slate-500">{{.Date}}</td>
+          <td class="text-right font-medium">{{.Amount}}</td>
+          <td class="text-right">
+            <span class="inline-flex px-2 py-0.5 rounded-full text-xs {{.StatusClass}}">{{.StatusLabel}}</span>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    {{else}}
+    <div class="text-center py-10">
+      <div class="text-sm text-slate-500 mb-3">{{t "invoices.empty"}}</div>
+      <a href="/invoices/new" class="inline-block rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "dash.new_invoice"}}</a>
+    </div>
+    {{end}}
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 shadow-sm">
+    <h2 class="font-semibold mb-4">{{t "dash.invoice_overview"}}</h2>
+    <canvas id="invoiceChart" height="160"></canvas>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('invoiceChart');
+        if (!ctx) return;
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['{{t "invoices.status.paid"}}', '{{t "invoices.status.issued"}}', '{{t "invoices.status.pending"}}'],
+            datasets: [{
+              data: [{{.Chart.Paid}}, {{.Chart.Issued}}, {{.Chart.Pending}}],
+              backgroundColor: ['#14b8a6', '#fbbf24', '#cbd5e1'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            cutout: '70%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+          }
+        });
+      });
+    </script>
+  </div>
+</div>
+{{end}}

@@ -1,0 +1,44 @@
+{{define "auth"}}<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{.Title}} · coachly</title>
+  <link rel="stylesheet" href="/assets/app.css" />
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-teal-500 text-slate-900 flex items-center justify-center text-2xl font-bold">c</div>
+      <div>
+        <div class="text-xl font-semibold">coachly</div>
+        <div class="text-xs text-slate-500">{{t "app.tagline"}}</div>
+      </div>
+    </div>
+    <h1 class="text-2xl font-semibold mb-1">{{.Heading}}</h1>
+    <p class="text-sm text-slate-500 mb-6">{{.Description}}</p>
+
+    {{if .Error}}<div class="mb-4 p-3 rounded-xl bg-rose-50 text-rose-700 text-sm">{{.Error}}</div>{{end}}
+
+    <form method="post" action="{{.Action}}" class="space-y-3">
+      <div>
+        <label class="text-xs font-medium text-slate-600">{{t "auth.password"}}</label>
+        <input name="password" type="password" required autofocus
+               class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+      </div>
+      {{if .Setup}}
+      <div>
+        <label class="text-xs font-medium text-slate-600">{{t "auth.password_repeat"}}</label>
+        <input name="password_repeat" type="password" required
+               class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+      </div>
+      {{end}}
+      <button type="submit"
+              class="w-full rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold py-2.5 mt-2">
+        {{.Submit}}
+      </button>
+    </form>
+  </div>
+</body>
+</html>
+{{end}}

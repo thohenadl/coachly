@@ -1,0 +1,51 @@
+{{define "content"}}
+<div class="flex items-center justify-between mb-4">
+  <div class="flex items-center gap-2">
+    <input type="search" name="q" placeholder="{{t "athletes.filter.name"}}"
+           class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm w-64" />
+    <select name="status" class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">
+      <option value="">{{t "athletes.filter.status"}}</option>
+      <option value="active">{{t "athletes.active"}}</option>
+      <option value="inactive">{{t "athletes.inactive"}}</option>
+    </select>
+  </div>
+  <a href="/athletes/new" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">+ {{t "athletes.add"}}</a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  {{if .Athletes}}
+  <table class="w-full text-sm">
+    <thead class="text-xs uppercase text-slate-500 bg-slate-50">
+      <tr>
+        <th class="text-left p-3">{{t "athletes.first_name"}} {{t "athletes.last_name"}}</th>
+        <th class="text-left">{{t "athletes.city"}}</th>
+        <th class="text-left">{{t "athletes.start_date"}}</th>
+        <th class="text-right">{{t "athletes.monthly_fee"}}</th>
+        <th class="text-right">{{t "invoices.status"}}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Athletes}}
+      <tr class="border-t border-slate-100 hover:bg-slate-50">
+        <td class="p-3 font-medium">{{.Name}}</td>
+        <td class="text-slate-600">{{.City}}</td>
+        <td class="text-slate-500">{{.StartDate}}</td>
+        <td class="text-right font-medium">{{.Fee}}</td>
+        <td class="text-right">
+          <span class="inline-flex px-2 py-0.5 rounded-full text-xs {{if .Active}}bg-teal-100 text-teal-700{{else}}bg-slate-100 text-slate-500{{end}}">
+            {{if .Active}}{{t "athletes.active"}}{{else}}{{t "athletes.inactive"}}{{end}}
+          </span>
+        </td>
+        <td class="p-3 text-right">
+          <a href="/athletes/{{.ID}}/edit" class="text-teal-600 hover:underline text-xs">{{t "app.edit"}}</a>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{else}}
+  <div class="p-10 text-center text-slate-500 text-sm">{{t "athletes.empty"}}</div>
+  {{end}}
+</div>
+{{end}}

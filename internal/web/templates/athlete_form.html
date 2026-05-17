@@ -1,0 +1,66 @@
+{{define "content"}}
+<form method="post" action="{{.Action}}" class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl space-y-4">
+  {{if .Error}}<div class="p-3 rounded-xl bg-rose-50 text-rose-700 text-sm">{{.Error}}</div>{{end}}
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.first_name"}}</label>
+      <input name="first_name" value="{{.A.FirstName}}" required
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none" />
+    </div>
+    <div>
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.last_name"}}</label>
+      <input name="last_name" value="{{.A.LastName}}" required
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none" />
+    </div>
+  </div>
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "athletes.street"}}</label>
+    <input name="street" value="{{.A.Address.Street}}"
+           class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none" />
+  </div>
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.postal_code"}}</label>
+      <input name="postal_code" value="{{.A.Address.PostalCode}}"
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+    </div>
+    <div class="col-span-2">
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.city"}}</label>
+      <input name="city" value="{{.A.Address.City}}"
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+    </div>
+  </div>
+  <div>
+    <label class="text-xs font-medium text-slate-600">{{t "athletes.country"}}</label>
+    <input name="country" value="{{.A.Address.Country}}"
+           class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+  </div>
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.monthly_fee"}}</label>
+      <input name="monthly_fee" type="text" value="{{.FeeStr}}" required
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+    </div>
+    <div>
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.start_date"}}</label>
+      <input name="start_date" type="date" value="{{.StartStr}}" required
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+    </div>
+    <div>
+      <label class="text-xs font-medium text-slate-600">{{t "athletes.end_date"}}</label>
+      <input name="end_date" type="date" value="{{.EndStr}}"
+             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+    </div>
+  </div>
+  <div class="flex items-center justify-between pt-2">
+    {{if .ShowDelete}}
+    <button form="del" type="submit" formaction="{{.DeleteAction}}" formmethod="post"
+            class="text-rose-600 hover:underline text-sm">{{t "app.delete"}}</button>
+    {{else}}<span></span>{{end}}
+    <div class="flex gap-2">
+      <a href="/athletes" class="rounded-full border border-slate-200 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
+      <button type="submit" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button>
+    </div>
+  </div>
+</form>
+{{end}}

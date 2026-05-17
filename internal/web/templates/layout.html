@@ -1,0 +1,66 @@
+{{define "layout"}}<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{.Title}} · coachly</title>
+  <link rel="stylesheet" href="/assets/app.css" />
+  <script src="/assets/htmx.min.js" defer></script>
+  <script src="/assets/alpine.min.js" defer></script>
+  <script src="/assets/chart.umd.js" defer></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+<div class="flex min-h-screen">
+  {{template "sidebar" .}}
+  <main class="flex-1 p-6 lg:p-8">
+    {{template "topbar" .}}
+    <div id="content">
+      {{template "content" .}}
+    </div>
+  </main>
+</div>
+</body>
+</html>
+{{end}}
+
+{{define "sidebar"}}
+<aside class="hidden md:flex w-60 shrink-0 bg-slate-900 text-slate-200 flex-col p-4 m-3 rounded-2xl">
+  <div class="flex items-center gap-2 px-2 py-4 mb-4 border-b border-slate-700">
+    <div class="w-9 h-9 rounded-xl bg-teal-500 flex items-center justify-center text-slate-900 font-bold">c</div>
+    <div>
+      <div class="font-semibold">coachly</div>
+      <div class="text-xs text-slate-400">Invoices</div>
+    </div>
+  </div>
+  <nav class="flex flex-col gap-1 text-sm">
+    {{$active := .ActiveNav}}
+    {{range .Nav}}
+      <a href="{{.Href}}"
+         class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-800 {{if eq $active .Key}}bg-teal-500 text-slate-900 font-semibold hover:bg-teal-400{{end}}">
+        <span class="w-1.5 h-1.5 rounded-full {{if eq $active .Key}}bg-slate-900{{else}}bg-slate-500{{end}}"></span>
+        {{.Label}}
+      </a>
+    {{end}}
+  </nav>
+  <div class="mt-auto pt-4 border-t border-slate-700">
+    <a href="/logout" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-slate-800 text-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+      {{t "app.logout"}}
+    </a>
+  </div>
+</aside>
+{{end}}
+
+{{define "topbar"}}
+<header class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold">{{.PageTitle}}</h1>
+    {{if .PageSubtitle}}<p class="text-sm text-slate-500">{{.PageSubtitle}}</p>{{end}}
+  </div>
+  <div class="flex items-center gap-3">
+    <input type="search" placeholder="{{t "app.search"}}"
+           class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-teal-400" />
+    <div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold">{{.Initials}}</div>
+  </div>
+</header>
+{{end}}
