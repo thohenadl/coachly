@@ -2,6 +2,7 @@ package web
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"strings"
@@ -15,6 +16,16 @@ import (
 var templateFuncs = template.FuncMap{
 	"t":         i18n.T,
 	"formatEUR": invoice.FormatEUR,
+	// json marshals any value to its JSON representation. Used in HTML
+	// attributes (e.g. Alpine x-data) so multi-line strings survive the
+	// attribute round-trip with proper \n escaping.
+	"json": func(v any) (string, error) {
+		b, err := json.Marshal(v)
+		if err != nil {
+			return "", err
+		}
+		return string(b), nil
+	},
 }
 
 type navItem struct {

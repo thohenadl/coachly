@@ -9,14 +9,19 @@ import (
 
 	"github.com/google/uuid"
 
+	"coachly/internal/auth"
 	"coachly/internal/i18n"
 	"coachly/internal/store"
 )
 
 // handleDataExport streams the current store as pretty-printed JSON.
 // This is the "decoded" form the user can put under version control.
+// The SMTP password is redacted so the export can be shared or stored
+// without leaking the mail credential; on re-import an empty password is
+// treated as "keep the existing one" (see handleDataImportConfirm).
 func (s *Server) handleDataExport(w http.ResponseWriter, r *http.Request) {
 	d := s.Store.Snapshot()
+	d.SMTP.Password = ""
 	body, err := json.MarshalIndent(d, "", "  ")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -85,7 +90,44 @@ func (s *Server) handleDataImportConfirm(w http.ResponseWriter, r *http.Request)
 		http.Redirect(w, r, "/settings?tab=data&err=settings.data.err_expired", http.StatusSeeOther)
 		return
 	}
+	if d.SMTP.Password == "" {
+		d.SMTP.Password = s.Store.Snapshot().SMTP.Password
+	}
 	if err := s.Store.ReplaceAll(d); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	http.Redirect(w, r, "/settings?tab=data&saved=1", http.StatusSeeOther)
+}
+
+// handleDataReset wipes the entire data store (athletes, invoices, tipps,
+// filters, counter, coach, finanzamt, SMTP, email template, preferences) and
+// replaces it with a fresh empty Data. The current password must be supplied
+// and is verified by re-running Unlock; the existing AES key+salt are reused
+// so no password re-entry is needed afterwards.
+func (s *Server) handleDataReset(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	if r.FormValue("confirm") != "RESET" {
+		http.Redirect(w, r, "/settings?tab=data&err=settings.data.reset.err_confirm", http.StatusSeeOther)
+		return
+	}
+	password := []byte(r.FormValue("password"))
+	if len(password) == 0 {
+		http.Redirect(w, r, "/settings?tab=data&err=settings.data.reset.err_password", http.StatusSeeOther)
+		return
+	}
+	if err := s.Store.Unlock(password); err != nil {
+		if err == auth.ErrBadPassword {
+			http.Redirect(w, r, "/settings?tab=data&err=settings.data.reset.err_bad_password", http.StatusSeeOther)
+			return
+		}
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	if err := s.Store.ReplaceAll(store.NewData()); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}

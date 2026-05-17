@@ -6,7 +6,7 @@
   <div class="flex gap-2 border-b border-slate-100 mb-6 text-sm">
     <button @click="tab='coach'"     :class="tab==='coach'     ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.coach"}}</button>
     <button @click="tab='finanzamt'" :class="tab==='finanzamt' ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.finanzamt"}}</button>
-    <button @click="tab='smtp'"      :class="tab==='smtp'      ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.smtp"}}</button>
+    <button @click="tab='email'"     :class="tab==='email'     ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.email"}}</button>
     <button @click="tab='storage'"   :class="tab==='storage'   ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.storage"}}</button>
     <button @click="tab='password'"  :class="tab==='password'  ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.password"}}</button>
     <button @click="tab='data'"      :class="tab==='data'      ? 'border-teal-500 text-slate-900' : 'border-transparent text-slate-500'" class="px-3 py-2 border-b-2">{{t "settings.tab.data"}}</button>
@@ -60,7 +60,9 @@
     </form>
   </div>
 
-  <div x-show="tab==='smtp'" x-cloak x-data="{ testTo: '{{.SMTP.From}}', testing: false, testOk: null, testMsg: '' }">
+  <div x-show="tab==='email'" x-cloak x-data="{ testTo: '{{.SMTP.From}}', testing: false, testOk: null, testMsg: '' }">
+    <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.email.smtp_title"}}</h3>
+    <p class="text-xs text-slate-500 mb-3">{{t "settings.email.smtp_desc"}}</p>
     <form method="post" action="/settings/smtp" class="space-y-3" x-ref="smtpForm">
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-xs text-slate-600">Host</label><input name="host" value="{{.SMTP.Host}}" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
@@ -114,6 +116,32 @@
       </div>
       <div x-show="testOk === true"  x-cloak class="mt-3 p-3 rounded-xl bg-teal-50 text-teal-700 text-sm" x-text="testMsg"></div>
       <div x-show="testOk === false" x-cloak class="mt-3 p-3 rounded-xl bg-rose-50 text-rose-700 text-sm break-words" x-text="testMsg"></div>
+    </div>
+
+    <div class="mt-10 border-t border-slate-100 pt-6"
+         x-data="{ subject: {{.EmailTemplate.Subject | json}}, body: {{.EmailTemplate.Body | json}} }">
+      <h3 class="text-sm font-semibold text-slate-900 mb-1">{{t "settings.email.template_title"}}</h3>
+      <p class="text-xs text-slate-500 mb-3">{{t "settings.email.template_desc"}}</p>
+      <form method="post" action="/settings/email" class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-600">{{t "settings.email.subject"}}</label>
+          <input name="subject" x-model="subject" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-600">{{t "settings.email.body"}}</label>
+          <textarea name="body" x-model="body" rows="8" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm"></textarea>
+        </div>
+        <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 leading-relaxed">
+          <div class="text-slate-500 mb-1">{{t "settings.email.tokens_title"}}</div>
+          <div>{{t "settings.email.tokens_hint"}}</div>
+        </div>
+        <div class="flex justify-between items-center pt-2">
+          <button type="button"
+                  @click="subject = {{.EmailDefaultSubject | json}}; body = {{.EmailDefaultBody | json}}"
+                  class="text-xs text-slate-500 hover:text-slate-900 underline">{{t "settings.email.reset_defaults"}}</button>
+          <button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "app.save"}}</button>
+        </div>
+      </form>
     </div>
   </div>
 

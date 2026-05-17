@@ -12,7 +12,11 @@
   </div>
 
   <form method="post" action="/athletes/import/preview" enctype="multipart/form-data" class="space-y-4">
-    <input type="file" name="file" accept=".csv,text/csv" required class="block text-sm" />
+    <label class="flex items-center gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 hover:border-teal-400 hover:bg-teal-50/40 px-4 py-4 cursor-pointer transition-colors">
+      <svg class="w-6 h-6 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 4v8m0 0l-4-4m4 4l4-4M3 20h18"/></svg>
+      <input type="file" name="file" accept=".csv,text/csv" required
+        class="block text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-teal-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-900 hover:file:bg-teal-400 file:cursor-pointer" />
+    </label>
     <div class="flex items-center justify-end gap-2">
       <a href="/athletes" class="rounded-full bg-white border border-slate-200 hover:border-slate-400 text-slate-700 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
       <button class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "athletes.import.upload_button"}}</button>

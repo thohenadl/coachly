@@ -111,8 +111,28 @@ func addAddresses(m core.Maroto, coach store.Coach, fa store.Finanzamt, a store.
 		)
 	}
 	m.AddRow(3)
-	m.AddRow(5, text.NewCol(12, fmt.Sprintf("Finanzamt: %s", fa.Name), props.Text{Size: 9}))
+	m.AddRow(5, text.NewCol(12, "Finanzamt:", props.Text{Size: 9, Style: fontstyle.Bold}))
+	for _, line := range finanzamtLines(fa) {
+		m.AddRow(5, text.NewCol(12, line, props.Text{Size: 9}))
+	}
 	m.AddRow(4)
+}
+
+func finanzamtLines(fa store.Finanzamt) []string {
+	cityLine := fa.Address.PostalCode
+	if cityLine != "" && fa.Address.City != "" {
+		cityLine += " " + fa.Address.City
+	} else if fa.Address.City != "" {
+		cityLine = fa.Address.City
+	}
+	candidates := []string{fa.Name, fa.Address.Street, cityLine, fa.Address.Country}
+	out := candidates[:0]
+	for _, c := range candidates {
+		if c != "" {
+			out = append(out, c)
+		}
+	}
+	return out
 }
 
 func addMeta(m core.Maroto, coach store.Coach, inv store.Invoice) {

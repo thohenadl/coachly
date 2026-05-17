@@ -101,12 +101,14 @@ func (s *Server) Routes() http.Handler {
 		r.Post("/settings/finanzamt", s.handleSettingsFinanzamt)
 		r.Post("/settings/smtp", s.handleSettingsSMTP)
 		r.Post("/settings/smtp/test", s.handleSettingsSMTPTest)
+		r.Post("/settings/email", s.handleSettingsEmailTemplate)
 		r.Post("/settings/storage", s.handleSettingsStorage)
 		r.Post("/settings/storage/pick", s.handleSettingsStoragePick)
 		r.Post("/settings/password", s.handleSettingsPassword)
 		r.Get("/settings/data/export", s.handleDataExport)
 		r.Post("/settings/data/import/preview", s.handleDataImportPreview)
 		r.Post("/settings/data/import/confirm", s.handleDataImportConfirm)
+		r.Post("/settings/data/reset", s.handleDataReset)
 	})
 
 	return r

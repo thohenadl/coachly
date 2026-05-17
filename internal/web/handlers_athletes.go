@@ -55,6 +55,8 @@ func (s *Server) handleAthletes(w http.ResponseWriter, r *http.Request) {
 
 	v := s.chrome("athletes", i18n.T("athletes.title"), "")
 	v["Athletes"] = rows
+	v["Q"] = r.URL.Query().Get("q")
+	v["StatusFilter"] = statusFilter
 	s.renderPage(w, "athletes.html", v)
 }
 

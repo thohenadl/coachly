@@ -88,13 +88,14 @@
 - **FR-E-04** — Erfolgreicher SMTP-Versand setzt den Status der Rechnung automatisch auf **Versendet**.
 - **FR-E-05** — Versand ist nur für Rechnungen im Status **Erstellt** möglich. Versendet- oder Bezahlt-Rechnungen können nicht erneut versendet werden — der Coach muss sie zuerst manuell auf „Erstellt" zurücksetzen.
 - **FR-E-06** — Verschlüsselungsmodus der SMTP-Verbindung ist explizit wählbar: „Automatisch" (Port-basiert), „SSL / TLS" (implizites TLS, üblicherweise Port 465), „STARTTLS" (üblicherweise Port 587) oder „Unverschlüsselt" (nur lokale Test-Relays). „Automatisch" entspricht dem v1-Verhalten und ist der Default.
+- **FR-E-07** — Betreff und Text der Rechnungs-E-Mail sind in den Einstellungen (Tab „E-Mail") konfigurierbar. Platzhalter werden beim Versand ersetzt: `{Vorname}`, `{Nachname}`, `{CoachVorname}`, `{CoachNachname}`, `{Nummer}` (Anzeige-Rechnungsnummer), `{MM}`/`{JJJJ}` (Monat/Jahr der Rechnung), `{Betrag}` (formatierter Bruttobetrag), `{Datum}` (Rechnungsdatum `TT.MM.JJJJ`). Leere Felder fallen auf den deutschen Default zurück.
 
 ### 4.6 Einstellungen / Stammdaten (`FR-S-*`)
 
 - **FR-S-01** — Coach-Stammdaten: Vorname, Nachname, Adresse, Bank, Kontoinhaber, IBAN, BIC, Steuernummer, UID.
 - **FR-S-02** — Finanzamt-Daten: Name (Default „Finanzamt Innsbruck"), Adresse.
 - **FR-S-03** — Master-Passwort ändern.
-- **FR-S-04** — SMTP-Felder (Host, Port, Verschlüsselung, User, Passwort, Absender, Enabled-Schalter), siehe FR-E-*.
+- **FR-S-04** — SMTP-Felder (Host, Port, Verschlüsselung, User, Passwort, Absender, Enabled-Schalter) sowie konfigurierbarer E-Mail-Inhalt (Betreff + Text mit Platzhaltern), siehe FR-E-*. Beides liegt im Tab „E-Mail".
 - **FR-S-05** — Daten-Export/Import: Der gesamte Datenbestand kann als unverschlüsselte, eingerückte JSON-Datei exportiert werden (Dateiname `coachly-export-JJJJ-MM-TT.json`). Eine zuvor exportierte JSON-Datei kann wieder importiert werden; der Import ersetzt den gesamten bestehenden Datenbestand und erfordert eine explizite Bestätigung („Ja, alles ersetzen"). Schema-Migration läuft beim Import automatisch.
 - **FR-S-06** — Konfigurierbares Rechnungsnummern-Format: Profil aus Tokens (`{YYYY}`, `{YY}`, `{MM}`, `{NNN}`, `{NNNN}`, `{N}`, `{firstname}`, `{lastname}`, `{initials}`). Der Default `{YYYY}{NNN}` entspricht dem v1-Verhalten. Bestehende Rechnungen behalten ihre Anzeige-Nummer (Einfrieren bei Erstellung); nur neue Rechnungen nutzen das aktuelle Format. Die fortlaufende Zählung (`Counter.NextInvoiceNumber`) bleibt monoton und lückenlos (FR-I-03).
 
@@ -176,3 +177,4 @@
 | 2026-05-17 | FR-E-01..05, FR-S-04 | SMTP-Versand aus v2 in v1 promoted: Versand per Klick auf erstellte Rechnungen, SMTP-Enabled-Schalter, automatischer Statuswechsel auf Versendet bei Erfolg. |
 | 2026-05-17 | FR-E-06 | Verschlüsselungsmodus der SMTP-Verbindung explizit wählbar (Auto / SSL / STARTTLS / Unverschlüsselt), damit Provider mit blockiertem STARTTLS-Port via SSL auf 465 nutzbar sind. |
 | 2026-05-17 | FR-S-06 | Konfigurierbares Rechnungsnummern-Format mit Token-Profil; Anzeige-Nummer bei Erstellung eingefroren. |
+| 2026-05-17 | FR-E-07, FR-S-04 | Tab „SMTP" in „E-Mail" umbenannt; konfigurierbarer Betreff und Text der Rechnungs-E-Mail mit Platzhaltern (Vorname/Nachname/Coach/Nummer/MM/JJJJ/Betrag/Datum). Schema v2 → v3 mit Default-Vorlage. |

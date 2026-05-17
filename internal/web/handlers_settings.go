@@ -162,7 +162,25 @@ func (s *Server) handleSettingsSMTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	http.Redirect(w, r, "/settings?tab=smtp&saved=1", http.StatusSeeOther)
+	http.Redirect(w, r, "/settings?tab=email&saved=1", http.StatusSeeOther)
+}
+
+func (s *Server) handleSettingsEmailTemplate(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	subject := r.FormValue("subject")
+	body := r.FormValue("body")
+	if err := s.Store.Mutate(func(d *store.Data) error {
+		d.EmailTemplate.Subject = subject
+		d.EmailTemplate.Body = body
+		return nil
+	}); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	http.Redirect(w, r, "/settings?tab=email&saved=1", http.StatusSeeOther)
 }
 
 // handleSettingsSMTPTest sends a small plain-text email using either the
