@@ -39,11 +39,11 @@ func (s *Server) renderSingleInvoiceForm(w http.ResponseWriter, month, selectedA
 	}
 
 	currentYear := time.Now().Year()
-	startYear := currentYear - 5
+	startYear := currentYear - 2
 	if y < startYear {
 		startYear = y
 	}
-	endYear := currentYear + 1
+	endYear := currentYear + 2
 	if y > endYear {
 		endYear = y
 	}
