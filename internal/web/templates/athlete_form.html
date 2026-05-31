@@ -86,16 +86,40 @@
 </form>
 
 {{if .ShowDelete}}
-<section class="bg-white rounded-2xl shadow-sm p-6 w-full">
-  <div class="flex items-center justify-between mb-4">
+<section class="bg-white rounded-2xl shadow-sm p-6 w-full space-y-6">
+  <div class="flex items-center justify-between">
     <h2 class="text-base font-semibold text-slate-800">{{t "athletes.invoices_title"}}</h2>
     {{if .Invoices}}
     <a href="{{.InvoicesListURL}}" class="text-sm text-teal-600 hover:underline">{{t "athletes.invoices_view_all"}} →</a>
     {{end}}
   </div>
 
+  {{if .BillingGrid}}
+  <div>
+    <h3 class="text-sm font-semibold text-slate-700 mb-2">{{t "athletes.billing_grid_title"}}</h3>
+    <div class="space-y-2">
+      {{range .BillingGrid}}
+      <div class="flex items-center gap-3">
+        <div class="text-xs font-mono text-slate-500 w-12">{{.Year}}</div>
+        <div class="grid grid-cols-12 gap-1 flex-1">
+          {{range .Chips}}
+            {{if .AnchorTo}}
+            <a href="#invoice-{{.AnchorTo}}" title="{{.Title}}"
+               class="text-[10px] text-center py-1 rounded {{.Class}} hover:opacity-80">{{.Label}}</a>
+            {{else}}
+            <span title="{{.Title}}"
+                  class="text-[10px] text-center py-1 rounded {{.Class}}">{{.Label}}</span>
+            {{end}}
+          {{end}}
+        </div>
+      </div>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+
   {{if .Invoices}}
-  <div class="grid grid-cols-2 gap-4 mb-4">
+  <div class="grid grid-cols-2 gap-4">
     <div class="rounded-xl bg-slate-50 p-3">
       <div class="text-xs text-slate-500">{{t "athletes.invoices_open"}}</div>
       <div class="text-lg font-semibold text-slate-800">{{.OpenCount}}</div>
@@ -119,7 +143,7 @@
       </thead>
       <tbody>
         {{range .Invoices}}
-        <tr class="border-t border-slate-100">
+        <tr id="invoice-{{.Number}}" class="border-t border-slate-100 target:bg-amber-50">
           <td class="p-2 font-mono text-xs">{{.Display}}</td>
           <td class="text-slate-500">{{.Period}}</td>
           <td class="text-right font-medium">{{.Amount}}</td>

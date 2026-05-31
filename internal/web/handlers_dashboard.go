@@ -35,15 +35,21 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 	var paidCt, sentCt, issuedCt, pendingCt int64
 	monthKey := invoice.FormatMonth(now.Year(), now.Month())
 
+	// Per-month KPIs attribute the *line's* amount to its own month, so a
+	// multi-month invoice contributes proportionally to each month it covers
+	// instead of inflating every month with the full invoice total.
 	for _, inv := range d.Invoices {
-		total += int64(inv.Amount)
-		if inv.Month == monthKey {
-			monthRev += int64(inv.Amount)
+		total += int64(inv.Total)
+		for _, l := range inv.Lines {
+			if l.Month != monthKey {
+				continue
+			}
+			monthRev += int64(l.Amount)
 			switch inv.Status {
 			case store.StatusIssued, store.StatusSent:
-				monthOpen += int64(inv.Amount)
+				monthOpen += int64(l.Amount)
 			case store.StatusPaid:
-				monthPaid += int64(inv.Amount)
+				monthPaid += int64(l.Amount)
 			}
 		}
 		switch inv.Status {
@@ -79,7 +85,7 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 			Display:     displayNumberFallback(inv),
 			Athlete:     a.FirstName + " " + a.LastName,
 			Date:        inv.IssuedAt.Format("02.01.2006"),
-			Amount:      invoice.FormatEUR(inv.Amount),
+			Amount:      invoice.FormatEUR(inv.Total),
 			StatusClass: cls,
 			StatusLabel: lbl,
 		})

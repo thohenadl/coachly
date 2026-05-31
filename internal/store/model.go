@@ -4,7 +4,7 @@ import "time"
 
 // SchemaVersion is bumped whenever the on-disk JSON shape changes.
 // Migrations live in store.go (loadAndMigrate).
-const SchemaVersion = 3
+const SchemaVersion = 4
 
 // Money is stored in euro-cents to avoid float pitfalls.
 type Money int64
@@ -100,6 +100,19 @@ const (
 	StatusPaid    InvoiceStatus = "paid"
 )
 
+// InvoiceLine is one billable month on an invoice (FR-I-06, amended for
+// multi-month invoices). Each line stands on its own: its own pro-rata
+// period, its own gross amount. An invoice's Total is the sum of its
+// Lines[].Amount.
+type InvoiceLine struct {
+	Month       string    `json:"month"` // "2026-05" — dedup key
+	PeriodFrom  time.Time `json:"period_from"`
+	PeriodTo    time.Time `json:"period_to"`
+	Description string    `json:"description"`
+	Amount      Money     `json:"amount_cents"` // gross, includes 20% USt
+	ProRata     bool      `json:"pro_rata"`
+}
+
 type Invoice struct {
 	Number int `json:"number"`
 	// DisplayNumber is the human-readable invoice identifier rendered from
@@ -108,16 +121,68 @@ type Invoice struct {
 	// remains the internal monotonic id used for URL routing & lookups.
 	DisplayNumber string        `json:"display_number,omitempty"`
 	AthleteID     string        `json:"athlete_id"`
-	Month         string        `json:"month"` // "2026-05"
 	Tipp          string        `json:"tipp"`
-	Description   string        `json:"description"`
-	PeriodFrom    time.Time     `json:"period_from"`
-	PeriodTo      time.Time     `json:"period_to"`
-	Amount        Money         `json:"amount_cents"` // gross, includes 20% USt
-	ProRata       bool          `json:"pro_rata"`
+	Lines         []InvoiceLine `json:"lines,omitempty"`
+	Total         Money         `json:"total_cents"` // gross, includes 20% USt; equals sum of Lines[].Amount
 	Status        InvoiceStatus `json:"status"`
 	IssuedAt      time.Time     `json:"issued_at"`
 	PDFPath       string        `json:"pdf_path,omitempty"`
+
+	// Legacy v3 scalar fields. Read by migrate() to seed Lines and Total on
+	// stores written before SchemaVersion=4. Cleared after migration; omitempty
+	// keeps them out of every subsequent on-disk write.
+	LegacyMonth       string    `json:"month,omitempty"`
+	LegacyDescription string    `json:"description,omitempty"`
+	LegacyPeriodFrom  time.Time `json:"period_from,omitempty"`
+	LegacyPeriodTo    time.Time `json:"period_to,omitempty"`
+	LegacyAmount      Money     `json:"amount_cents,omitempty"`
+	LegacyProRata     bool      `json:"pro_rata,omitempty"`
+}
+
+// PrimaryMonth returns the first line's month key (e.g. "2026-05"), used as
+// the canonical "year/month this invoice belongs to" when a single value is
+// needed (PDF filename, mailer template, etc.). Empty for invoices with no
+// lines (shouldn't happen post-migration).
+func (i Invoice) PrimaryMonth() string {
+	if len(i.Lines) == 0 {
+		return ""
+	}
+	return i.Lines[0].Month
+}
+
+// CoversMonth reports whether any of the invoice's lines is for monthKey
+// ("2026-05" format). Used by dedup and "already invoiced" hints.
+func (i Invoice) CoversMonth(monthKey string) bool {
+	for _, l := range i.Lines {
+		if l.Month == monthKey {
+			return true
+		}
+	}
+	return false
+}
+
+// CoversYear reports whether any of the invoice's lines is in the given year.
+func (i Invoice) CoversYear(year int) bool {
+	prefix := monthYearPrefix(year)
+	for _, l := range i.Lines {
+		if len(l.Month) >= 4 && l.Month[:5] == prefix {
+			return true
+		}
+	}
+	return false
+}
+
+func monthYearPrefix(year int) string {
+	// Keep allocation off the heap for hot loops in invoices_list/dashboard.
+	const digits = "0123456789"
+	y := year
+	var buf [5]byte
+	for i := 3; i >= 0; i-- {
+		buf[i] = digits[y%10]
+		y /= 10
+	}
+	buf[4] = '-'
+	return string(buf[:])
 }
 
 // MonthlyTipp holds the default tipp for a month plus optional per-athlete
