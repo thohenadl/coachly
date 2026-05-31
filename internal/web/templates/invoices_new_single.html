@@ -4,31 +4,72 @@
   <h2 class="text-lg font-semibold text-slate-900">{{t "invoices.single.title"}}</h2>
 
   <div>
-    <label class="text-xs font-medium text-slate-600">{{t "invoices.month"}}</label>
-    <div class="mt-1 grid grid-cols-2 gap-2">
-      <select name="month_num" required
-              class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white">
-        {{range .MonthOptions}}
-        <option value="{{.Value}}" {{if eq .Value $.SelectedMonth}}selected{{end}}>{{.Label}}</option>
-        {{end}}
-      </select>
-      <select name="year" required
-              class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white">
-        {{range .YearOptions}}
-        <option value="{{.}}" {{if eq . $.SelectedYear}}selected{{end}}>{{.}}</option>
-        {{end}}
-      </select>
-    </div>
-  </div>
-
-  <div>
     <label class="text-xs font-medium text-slate-600">{{t "invoices.single.athlete"}}</label>
-    <select name="athlete_id" required
+    <select name="athlete_id" required onchange="this.form.submit()"
             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white">
+      <option value="" {{if eq .SelectedAthlete ""}}selected{{end}}>—</option>
       {{range .Athletes}}
       <option value="{{.ID}}" {{if eq .ID $.SelectedAthlete}}selected{{end}}>{{.Name}}</option>
       {{end}}
     </select>
+  </div>
+
+  {{if .SelectedAthlete}}
+    {{if .SummaryBilled}}
+    <div class="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+      <span class="font-semibold">{{t "invoices.single.summary_billed"}}:</span>
+      {{range $i, $m := .SummaryBilled}}{{if $i}}, {{end}}{{$m}}{{end}}
+    </div>
+    {{else}}
+    <div class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-600">
+      {{t "invoices.single.summary_none"}}
+    </div>
+    {{end}}
+  {{end}}
+
+  <div>
+    <div class="flex items-center justify-between mb-1">
+      <label class="text-xs font-medium text-slate-600">{{t "invoices.single.lines_title"}}</label>
+    </div>
+    <p class="text-xs text-slate-500 mb-2">{{t "invoices.single.lines_help"}}</p>
+
+    <div class="space-y-2">
+      {{range $i, $row := .Lines}}
+      <div class="flex items-start gap-2">
+        <div class="grid grid-cols-2 gap-2 flex-1">
+          <select name="line_month" required onchange="this.form.submit()"
+                  class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white text-sm">
+            {{range $.MonthOptions}}
+            <option value="{{.Value}}" {{if eq .Value $row.MonthValue}}selected{{end}}>{{.Label}}</option>
+            {{end}}
+          </select>
+          <select name="line_year" required onchange="this.form.submit()"
+                  class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-teal-400 focus:outline-none bg-white text-sm">
+            {{range $.YearOptions}}
+            <option value="{{.}}" {{if eq . $row.Year}}selected{{end}}>{{.}}</option>
+            {{end}}
+          </select>
+        </div>
+        <button type="submit" name="action" value="remove_row" formnovalidate
+                title="{{t "invoices.single.remove_row"}}"
+                onclick="this.form.querySelector('input[name=row_idx]').value='{{$i}}'"
+                class="mt-1 text-rose-500 hover:text-rose-600 text-sm px-2 py-1">×</button>
+      </div>
+      {{if $row.ConflictWith}}
+      <div class="-mt-1 ml-1 text-xs text-rose-600">⚠ {{t "invoices.single.row_conflict"}} {{$row.ConflictWith}}</div>
+      {{end}}
+      {{if $row.Inactive}}
+      <div class="-mt-1 ml-1 text-xs text-rose-600">✗ {{t "invoices.single.row_inactive"}}</div>
+      {{end}}
+      {{end}}
+    </div>
+
+    <input type="hidden" name="row_idx" value="" />
+
+    <div class="mt-2">
+      <button type="submit" name="action" value="add_row" formnovalidate
+              class="text-sm text-teal-700 hover:text-teal-900 font-medium">{{t "invoices.single.add_row"}}</button>
+    </div>
   </div>
 
   <div>
@@ -39,7 +80,7 @@
 
   <div class="flex items-center justify-end gap-2 pt-2">
     <a href="/invoices" class="rounded-full border border-slate-200 px-5 py-2 text-sm">{{t "app.cancel"}}</a>
-    <button type="submit" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "invoices.preview"}}</button>
+    <button type="submit" name="action" value="preview" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">{{t "invoices.preview"}}</button>
   </div>
 </form>
 {{end}}

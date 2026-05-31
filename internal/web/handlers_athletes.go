@@ -74,6 +74,7 @@ type athleteFormVM struct {
 	OpenCount       int
 	OpenAmount      string
 	InvoicesListURL string
+	BillingGrid     []billingYearRow
 	Error           string
 }
 
@@ -85,6 +86,24 @@ type athleteInvoiceRow struct {
 	StatusClass string
 	StatusLabel string
 	PDFPath     string
+}
+
+// billingYearRow is one row of the chip grid on the athlete detail page:
+// a year plus 12 chips (Jan…Dez), each describing the status of the invoice
+// covering that month (or "none"/"inactive").
+type billingYearRow struct {
+	Year  int
+	Chips []billingChip
+}
+
+type billingChip struct {
+	Month       int    // 1..12
+	Label       string // "Jan", "Feb", ...
+	Status      string // "issued" | "sent" | "paid" | "pending_pdf" | "none" | "inactive"
+	Class       string // tailwind classes for the chip background/border
+	Title       string // tooltip — invoice number + status label
+	AnchorTo    int    // invoice number; non-zero means linkable
+	NumberLabel string // displayed when chip is linked, e.g. "#142"
 }
 
 func (s *Server) handleAthleteForm(w http.ResponseWriter, r *http.Request) {
@@ -116,21 +135,22 @@ func (s *Server) handleAthleteForm(w http.ResponseWriter, r *http.Request) {
 			vm.Invoices = append(vm.Invoices, athleteInvoiceRow{
 				Number:      inv.Number,
 				Display:     displayNumberFallback(inv),
-				Period:      fmt.Sprintf("%s – %s", inv.PeriodFrom.Format("02.01.2006"), inv.PeriodTo.Format("02.01.2006")),
-				Amount:      invoice.FormatEUR(inv.Amount),
+				Period:      formatInvoicePeriod(inv.Lines),
+				Amount:      invoice.FormatEUR(inv.Total),
 				StatusClass: cls,
 				StatusLabel: lbl,
 				PDFPath:     inv.PDFPath,
 			})
 			if inv.Status == store.StatusIssued || inv.Status == store.StatusSent {
 				vm.OpenCount++
-				open += inv.Amount
+				open += inv.Total
 			}
 		}
 		sort.Slice(vm.Invoices, func(i, j int) bool { return vm.Invoices[i].Number > vm.Invoices[j].Number })
 		vm.HasInvoices = len(vm.Invoices) > 0
 		vm.OpenAmount = invoice.FormatEUR(open)
 		vm.InvoicesListURL = "/invoices?athlete=" + id
+		vm.BillingGrid = buildBillingGrid(vm.A, d.Invoices)
 	}
 	v := s.chrome("athletes", i18n.T("athletes.add"), "")
 	v["A"] = vm.A
@@ -145,9 +165,96 @@ func (s *Server) handleAthleteForm(w http.ResponseWriter, r *http.Request) {
 	v["OpenCount"] = vm.OpenCount
 	v["OpenAmount"] = vm.OpenAmount
 	v["InvoicesListURL"] = vm.InvoicesListURL
+	v["BillingGrid"] = vm.BillingGrid
 	v["Error"] = vm.Error
 	s.renderPage(w, "athlete_form.html", v)
 }
+
+// buildBillingGrid returns one row per year (current year + previous year)
+// for the athlete's chip grid. Months outside the athlete's active range
+// render as "inactive" chips; months covered by an invoice render with the
+// invoice's status and link target (#invoice-N).
+func buildBillingGrid(a store.Athlete, invoices []store.Invoice) []billingYearRow {
+	if a.ID == "" {
+		return nil
+	}
+	now := time.Now()
+	currentYear := now.Year()
+	startYear := currentYear - 1
+	if !a.StartDate.IsZero() && a.StartDate.Year() > startYear {
+		startYear = a.StartDate.Year()
+	}
+	endYear := currentYear
+	if a.EndDate != nil && a.EndDate.Year() < endYear {
+		endYear = a.EndDate.Year()
+	}
+	if startYear > endYear {
+		startYear, endYear = currentYear, currentYear
+	}
+
+	// Index covering invoices by month for quick lookup.
+	cover := map[string]store.Invoice{}
+	for _, inv := range invoices {
+		if inv.AthleteID != a.ID {
+			continue
+		}
+		for _, l := range inv.Lines {
+			cover[l.Month] = inv
+		}
+	}
+
+	rows := make([]billingYearRow, 0, endYear-startYear+1)
+	for y := endYear; y >= startYear; y-- {
+		row := billingYearRow{Year: y, Chips: make([]billingChip, 0, 12)}
+		for mo := time.January; mo <= time.December; mo++ {
+			chip := billingChip{Month: int(mo), Label: shortMonth(mo)}
+			if !a.Active(y, mo) {
+				chip.Status = "inactive"
+				chip.Class = "bg-slate-50 text-slate-300 border border-dashed border-slate-200"
+				chip.Title = shortMonth(mo) + " " + intStr(y)
+				row.Chips = append(row.Chips, chip)
+				continue
+			}
+			key := fmt.Sprintf("%04d-%02d", y, int(mo))
+			inv, has := cover[key]
+			if !has {
+				chip.Status = "none"
+				chip.Class = "bg-white text-slate-400 border border-slate-200"
+				chip.Title = shortMonth(mo) + " " + intStr(y) + " — nicht abgerechnet"
+				row.Chips = append(row.Chips, chip)
+				continue
+			}
+			chip.Status = string(inv.Status)
+			chip.Class = chipClassForStatus(inv.Status)
+			chip.AnchorTo = inv.Number
+			chip.NumberLabel = "#" + displayNumberFallback(inv)
+			chip.Title = shortMonth(mo) + " " + intStr(y) + " — " + chip.NumberLabel + " (" + statusLabel(inv.Status) + ")"
+			row.Chips = append(row.Chips, chip)
+		}
+		rows = append(rows, row)
+	}
+	return rows
+}
+
+func chipClassForStatus(st store.InvoiceStatus) string {
+	switch st {
+	case store.StatusPaid:
+		return "bg-teal-100 text-teal-700 border border-teal-200"
+	case store.StatusSent:
+		return "bg-indigo-100 text-indigo-700 border border-indigo-200"
+	case store.StatusIssued:
+		return "bg-amber-100 text-amber-700 border border-amber-200"
+	default:
+		return "bg-slate-100 text-slate-500 border border-slate-200"
+	}
+}
+
+func statusLabel(st store.InvoiceStatus) string {
+	_, lbl := statusBadge(st)
+	return lbl
+}
+
+func intStr(n int) string { return strconv.Itoa(n) }
 
 func (s *Server) handleAthleteCreate(w http.ResponseWriter, r *http.Request) {
 	a, err := parseAthleteForm(r, "")

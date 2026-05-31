@@ -61,7 +61,9 @@ func (s *Server) handleInvoices(w http.ResponseWriter, r *http.Request) {
 	monthsSet := map[string]struct{}{}
 	rows := make([]invoiceRow, 0, len(sorted))
 	for _, inv := range sorted {
-		monthsSet[inv.Month] = struct{}{}
+		for _, l := range inv.Lines {
+			monthsSet[l.Month] = struct{}{}
+		}
 		if !matchInvoiceFilter(inv, athleteByID[inv.AthleteID], filter, qLower) {
 			continue
 		}
@@ -75,8 +77,8 @@ func (s *Server) handleInvoices(w http.ResponseWriter, r *http.Request) {
 			Number:      inv.Number,
 			Display:     displayNumberFallback(inv),
 			Athlete:     a.FirstName + " " + a.LastName,
-			Period:      fmt.Sprintf("%s – %s", inv.PeriodFrom.Format("02.01.2006"), inv.PeriodTo.Format("02.01.2006")),
-			Amount:      invoice.FormatEUR(inv.Amount),
+			Period:      formatInvoicePeriod(inv.Lines),
+			Amount:      invoice.FormatEUR(inv.Total),
 			Status:      string(inv.Status),
 			StatusClass: cls,
 			StatusLabel: lbl,
@@ -130,7 +132,7 @@ func matchInvoiceFilter(inv store.Invoice, a store.Athlete, f invoiceFilter, qLo
 	if f.Athlete != "" && inv.AthleteID != f.Athlete {
 		return false
 	}
-	if f.Month != "" && inv.Month != f.Month {
+	if f.Month != "" && !inv.CoversMonth(f.Month) {
 		return false
 	}
 	if qLower != "" {
@@ -264,12 +266,14 @@ func (s *Server) handleInvoicesPreview(w http.ResponseWriter, r *http.Request) {
 
 	// Detect conflict: invoices already exist for this month. Unless the user
 	// has already picked a mode (append / overwrite), surface the choice.
+	// "Exists" here includes any invoice whose lines cover the target month —
+	// both pure single-month invoices and multi-month bundles.
 	mode := r.FormValue("mode")
 	if mode == "" {
 		monthKey := invoice.FormatMonth(y, m)
 		exists := 0
 		for _, inv := range s.Store.Snapshot().Invoices {
-			if inv.Month == monthKey {
+			if inv.CoversMonth(monthKey) {
 				exists++
 			}
 		}
@@ -358,8 +362,8 @@ func (s *Server) handleInvoicesPreview(w http.ResponseWriter, r *http.Request) {
 			Number:  inv.Number,
 			Display: displayNumberFallback(inv),
 			Athlete: a.FirstName + " " + a.LastName,
-			Period:  fmt.Sprintf("%s – %s", inv.PeriodFrom.Format("02.01.2006"), inv.PeriodTo.Format("02.01.2006")),
-			Amount:  invoice.FormatEUR(inv.Amount),
+			Period:  formatInvoicePeriod(inv.Lines),
+			Amount:  invoice.FormatEUR(inv.Total),
 			Tipp:    inv.Tipp,
 		})
 	}

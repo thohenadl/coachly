@@ -49,8 +49,9 @@ func Render(outDir string, coach store.Coach, fa store.Finanzamt, athlete store.
 	if err := os.MkdirAll(outDir, 0o700); err != nil {
 		return "", err
 	}
-	month := monthFromString(inv.Month)
-	year := yearFromString(inv.Month)
+	primary := inv.PrimaryMonth()
+	month := monthFromString(primary)
+	year := yearFromString(primary)
 	name := invoice.PDFFilename(athlete.FirstName, year, month, inv.DisplayNumber)
 	full := filepath.Join(outDir, name)
 	if err := doc.Save(full); err != nil {
@@ -166,19 +167,21 @@ func addLineItems(m core.Maroto, inv store.Invoice) {
 		text.NewCol(5, "Beschreibung", props.Text{Size: 9, Style: fontstyle.Bold}),
 		text.NewCol(3, "Kosten in Euro (inkl. 20 % USt)", props.Text{Size: 9, Style: fontstyle.Bold, Align: align.Right}),
 	)
-	period := fmt.Sprintf("%s – %s",
-		inv.PeriodFrom.Format("02.01.2006"),
-		inv.PeriodTo.Format("02.01.2006"),
-	)
-	m.AddRow(6,
-		text.NewCol(4, period, props.Text{Size: 10}),
-		text.NewCol(5, inv.Description, props.Text{Size: 10}),
-		text.NewCol(3, invoice.FormatEUR(inv.Amount), props.Text{Size: 10, Align: align.Right}),
-	)
+	for _, line := range inv.Lines {
+		period := fmt.Sprintf("%s – %s",
+			line.PeriodFrom.Format("02.01.2006"),
+			line.PeriodTo.Format("02.01.2006"),
+		)
+		m.AddRow(6,
+			text.NewCol(4, period, props.Text{Size: 10}),
+			text.NewCol(5, line.Description, props.Text{Size: 10}),
+			text.NewCol(3, invoice.FormatEUR(line.Amount), props.Text{Size: 10, Align: align.Right}),
+		)
+	}
 	m.AddRow(2)
 	m.AddRow(6,
 		col.New(9),
-		text.NewCol(3, "Total: "+invoice.FormatEUR(inv.Amount), props.Text{Size: 11, Style: fontstyle.Bold, Align: align.Right}),
+		text.NewCol(3, "Total: "+invoice.FormatEUR(inv.Total), props.Text{Size: 11, Style: fontstyle.Bold, Align: align.Right}),
 	)
 	m.AddRow(4)
 }

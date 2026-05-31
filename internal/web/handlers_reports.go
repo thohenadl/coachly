@@ -31,14 +31,19 @@ func (s *Server) handleReports(w http.ResponseWriter, r *http.Request) {
 	monthKey := invoice.FormatMonth(currentYear, now.Month())
 	yearPrefix := fmt.Sprintf("%04d-", currentYear)
 
+	// Total covers everything, no per-month slicing. Month- and YTD-tiles
+	// attribute *per-line* amounts to their own month/year, so a multi-month
+	// invoice contributes its Mai-line to "Mai 2026" only, etc.
 	var month, total, ytd statusSums
 	for _, inv := range d.Invoices {
-		total.add(inv.Status, inv.Amount)
-		if inv.Month == monthKey {
-			month.add(inv.Status, inv.Amount)
-		}
-		if strings.HasPrefix(inv.Month, yearPrefix) {
-			ytd.add(inv.Status, inv.Amount)
+		total.add(inv.Status, inv.Total)
+		for _, l := range inv.Lines {
+			if l.Month == monthKey {
+				month.add(inv.Status, l.Amount)
+			}
+			if strings.HasPrefix(l.Month, yearPrefix) {
+				ytd.add(inv.Status, l.Amount)
+			}
 		}
 	}
 

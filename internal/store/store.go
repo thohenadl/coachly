@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
+	"time"
 
 	"coachly/internal/auth"
 )
@@ -231,6 +232,34 @@ func migrate(d *Data) error {
 			d.EmailTemplate.Body = DefaultEmailBody
 		}
 		d.SchemaVersion = 3
+		fallthrough
+	case 3:
+		// v3 → v4: multi-month invoices. Each pre-v4 invoice carried scalar
+		// Month/Description/Period/Amount/ProRata fields and was implicitly
+		// one billable month. Fold those into a single-element Lines slice
+		// and set Total = Amount. Clears the legacy fields so subsequent
+		// saves omit them entirely.
+		for i := range d.Invoices {
+			inv := &d.Invoices[i]
+			if len(inv.Lines) == 0 && inv.LegacyMonth != "" {
+				inv.Lines = []InvoiceLine{{
+					Month:       inv.LegacyMonth,
+					PeriodFrom:  inv.LegacyPeriodFrom,
+					PeriodTo:    inv.LegacyPeriodTo,
+					Description: inv.LegacyDescription,
+					Amount:      inv.LegacyAmount,
+					ProRata:     inv.LegacyProRata,
+				}}
+				inv.Total = inv.LegacyAmount
+			}
+			inv.LegacyMonth = ""
+			inv.LegacyDescription = ""
+			inv.LegacyPeriodFrom = time.Time{}
+			inv.LegacyPeriodTo = time.Time{}
+			inv.LegacyAmount = 0
+			inv.LegacyProRata = false
+		}
+		d.SchemaVersion = 4
 		fallthrough
 	case SchemaVersion:
 		return nil
