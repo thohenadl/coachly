@@ -8,6 +8,10 @@
       <input type="hidden" name="month" value="{{.Filter.Month}}" />
       <button type="submit" class="rounded-full bg-white border border-indigo-500 text-indigo-700 hover:bg-indigo-50 font-semibold px-5 py-2 text-sm">{{t "invoices.send_all"}} ({{.SendableCount}})</button>
     </form>
+    {{else}}
+    <button type="button" disabled
+            title="{{if not .SMTPEnabled}}{{t "invoices.send.err_not_enabled"}}{{else if not .Filter.Month}}{{t "invoices.send_all.hint_month"}}{{else}}{{t "invoices.send_all.hint_none"}}{{end}}"
+            class="rounded-full bg-white border border-slate-200 text-slate-400 cursor-not-allowed font-semibold px-5 py-2 text-sm">{{t "invoices.send_all"}}</button>
     {{end}}
     <a href="/invoices/new/single" class="rounded-full bg-white border border-teal-500 text-teal-700 hover:bg-teal-50 font-semibold px-5 py-2 text-sm">+ {{t "invoices.create_single"}}</a>
     <a href="/invoices/new" class="rounded-full bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold px-5 py-2 text-sm">+ {{t "invoices.create"}}</a>

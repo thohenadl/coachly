@@ -188,6 +188,8 @@ var de = map[string]string{
 	"invoices.send":                   "Per E-Mail versenden",
 	"invoices.send_all":               "Alle Mails senden",
 	"invoices.send_all.confirm":       "Alle offenen Rechnungs-Mails dieses Monats jetzt versenden?",
+	"invoices.send_all.hint_month":    "Bitte zuerst einen Monat im Filter wählen.",
+	"invoices.send_all.hint_none":     "Keine versendbaren Rechnungen in diesem Monat.",
 	"invoices.send_all.result_sent":   "Versendete E-Mails",
 	"invoices.send_all.result_failed": "Fehlgeschlagen",
 	"invoices.send.success":           "Rechnung versendet.",
@@ -336,6 +338,8 @@ var de = map[string]string{
 	"docs.athletes.import.title": "Mehrere Athleten gleichzeitig importieren",
 	"docs.athletes.import.body":  "Wenn du viele Athleten auf einmal übernehmen möchtest, kannst du sie aus einer Tabelle (CSV-Datei) hochladen. Den Import findest du unter „Einstellungen → Daten → Athleten per CSV importieren“. Vor dem Speichern siehst du eine Vorschau und kannst bei Konflikten Zeile für Zeile entscheiden, ob bestehende Daten überschrieben werden.",
 
+	"docs.invoices.send_all.title": "Alle Mails eines Monats senden",
+	"docs.invoices.send_all.body":  "Wähle im Filter einen Monat aus – dann wird der Button „Alle Mails senden“ aktiv und zeigt die Anzahl der versendbaren Rechnungen. Nach einer Bestätigung werden alle Rechnungen dieses Monats im Status Erstellt (mit PDF und hinterlegter E-Mail-Adresse) auf einmal versendet und auf Versendet gesetzt. Bereits versendete oder bezahlte Rechnungen werden übersprungen. Schlägt ein Versand fehl, laufen die übrigen weiter; das Ergebnis wird oben angezeigt. Ohne gewählten Monat oder ohne aktiven E-Mail-Versand (Einstellungen → E-Mail) bleibt der Button ausgegraut.",
 	"docs.invoices.list.title": "Rechnungs-Übersicht",
 	"docs.invoices.list.body":  "Die Übersicht listet alle erstellten Rechnungen mit Nummer, Athlet, Zeitraum, Betrag und Status (Entwurf, Erstellt, Versendet, Bezahlt). Du kannst nach Status, Athlet, Monat oder Stichwort filtern. Pro Rechnung kannst du das PDF öffnen, den Status ändern oder die Rechnung versenden bzw. löschen.",
 
