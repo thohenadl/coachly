@@ -91,6 +91,7 @@
 - **FR-E-05** — Versand ist nur für Rechnungen im Status **Erstellt** möglich. Versendet- oder Bezahlt-Rechnungen können nicht erneut versendet werden — der Coach muss sie zuerst manuell auf „Erstellt" zurücksetzen.
 - **FR-E-06** — Verschlüsselungsmodus der SMTP-Verbindung ist explizit wählbar: „Automatisch" (Port-basiert), „SSL / TLS" (implizites TLS, üblicherweise Port 465), „STARTTLS" (üblicherweise Port 587) oder „Unverschlüsselt" (nur lokale Test-Relays). „Automatisch" entspricht dem v1-Verhalten und ist der Default.
 - **FR-E-07** — Betreff und Text der Rechnungs-E-Mail sind in den Einstellungen (Tab „E-Mail") konfigurierbar. Platzhalter werden beim Versand ersetzt: `{Vorname}`, `{Nachname}`, `{CoachVorname}`, `{CoachNachname}`, `{Nummer}` (Anzeige-Rechnungsnummer), `{MM}`/`{JJJJ}` (Monat/Jahr der Rechnung), `{Betrag}` (formatierter Bruttobetrag), `{Datum}` (Rechnungsdatum `TT.MM.JJJJ`). Leere Felder fallen auf den deutschen Default zurück.
+- **FR-E-08** — Ist in der Rechnungsliste ein Monat gefiltert, versendet der Button „Alle Mails senden" alle Rechnungen dieses Monats im Status **Erstellt** (mit PDF und Athleten-E-Mail) in einem Schritt. Einzelne Fehler brechen den Versand nicht ab; das Ergebnis (Anzahl versendet, fehlgeschlagene Athleten) wird angezeigt.
 
 ### 4.6 Einstellungen / Stammdaten (`FR-S-*`)
 
@@ -186,3 +187,4 @@
 | 2026-05-31 | FR-P-01 | Einseitigkeit ist Ziel, nicht Pflicht: automatischer Seitenumbruch für mehrzeilige (mehrmonatige) Rechnungen erlaubt. |
 | 2026-05-31 | FR-I-09 | „Mit selber Nummer neu erstellen" ist im Einzel-Flow nur für einmonatige Rechnungen verfügbar — bei mehrmonatigen Rechnungen muss der Coach manuell löschen. |
 | 2026-05-31 | Schema | Store-Schema v3 → v4: `Invoice.Lines []InvoiceLine` + `Invoice.Total Money` eingeführt; v3-Skalare (`month`, `description`, `period_from`, `period_to`, `amount_cents`, `pro_rata`) werden beim Laden einmalig in eine 1-elementige Lines-Liste gefaltet und danach aus dem JSON entfernt. |
+| 2026-10-30 | FR-E-08 | Button „Alle Mails senden" für den gefilterten Monat ergänzt (Sammelversand aller erstellten Rechnungen). |

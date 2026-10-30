@@ -109,6 +109,14 @@ func (s *Server) handleInvoices(w http.ResponseWriter, r *http.Request) {
 	v["Filter"] = filter
 	v["AthleteOptions"] = athleteOpts
 	v["MonthOptions"] = months
+	v["SMTPEnabled"] = d.SMTP.Enabled
+	if filter.Month != "" {
+		v["SendableCount"] = len(sendableForMonth(d, filter.Month))
+	}
+	if sentStr := r.URL.Query().Get("sent"); sentStr != "" {
+		v["SendResultSent"] = sentStr
+		v["SendResultFailed"] = r.URL.Query().Get("failed")
+	}
 	v["HasFilter"] = filter.Status != "" || filter.Athlete != "" || filter.Month != "" || filter.Query != ""
 	s.renderPage(w, "invoices.html", v)
 }

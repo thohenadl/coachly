@@ -31,10 +31,10 @@ type athleteImport struct {
 }
 
 type athleteImportRow struct {
-	RowNum    int           // 1-based, header counts as row 1
-	Proposed  store.Athlete // ID populated for conflicts; empty for "new with empty id"
-	Current   store.Athlete // only set for Conflicts
-	HasID     bool          // false → we'll generate one at confirm time
+	RowNum   int           // 1-based, header counts as row 1
+	Proposed store.Athlete // ID populated for conflicts; empty for "new with empty id"
+	Current  store.Athlete // only set for Conflicts
+	HasID    bool          // false → we'll generate one at confirm time
 }
 
 type athleteImportError struct {
