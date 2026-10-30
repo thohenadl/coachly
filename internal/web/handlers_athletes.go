@@ -329,17 +329,17 @@ func parseAthleteForm(r *http.Request, id string) (store.Athlete, error) {
 		return store.Athlete{}, err
 	}
 	fields := map[string]string{
-		"first_name":   r.FormValue("first_name"),
-		"last_name":    r.FormValue("last_name"),
-		"street":       r.FormValue("street"),
-		"postal_code":  r.FormValue("postal_code"),
-		"city":         r.FormValue("city"),
-		"country":      r.FormValue("country"),
-		"monthly_fee":  r.FormValue("monthly_fee"),
-		"start_date":   r.FormValue("start_date"),
-		"end_date":     r.FormValue("end_date"),
-		"email":        r.FormValue("email"),
-		"notes":        r.FormValue("notes"),
+		"first_name":  r.FormValue("first_name"),
+		"last_name":   r.FormValue("last_name"),
+		"street":      r.FormValue("street"),
+		"postal_code": r.FormValue("postal_code"),
+		"city":        r.FormValue("city"),
+		"country":     r.FormValue("country"),
+		"monthly_fee": r.FormValue("monthly_fee"),
+		"start_date":  r.FormValue("start_date"),
+		"end_date":    r.FormValue("end_date"),
+		"email":       r.FormValue("email"),
+		"notes":       r.FormValue("notes"),
 	}
 	a, err := parseAthleteFields(fields)
 	if err != nil {

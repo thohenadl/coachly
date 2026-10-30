@@ -62,7 +62,7 @@ func TestRenderNewTemplates(t *testing.T) {
 				"YearOptions":  []int{2026},
 				"MonthOptions": []monthOption{{Value: "05", Label: "Mai"}},
 				"Athletes":     []athleteOption{},
-				"Lines": []singleLineRow{{Idx: 0, Year: 2026, MonthValue: "05"}},
+				"Lines":        []singleLineRow{{Idx: 0, Year: 2026, MonthValue: "05"}},
 				"Tipp":         "", "SelectedAthlete": "",
 				"SummaryBilled": []string{},
 				"Error":         "",

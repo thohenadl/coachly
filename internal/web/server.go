@@ -48,12 +48,12 @@ func NewServer(s *store.Store, dataDir, invoicesDir string, assets, docsImages f
 		return nil, err
 	}
 	return &Server{
-		Store:        s,
-		DataDir:      dataDir,
-		InvoicesDir:  invoicesDir,
-		AssetsFS:     assets,
-		DocsImagesFS: docsImages,
-		tmpl:         tmpl,
+		Store:                 s,
+		DataDir:               dataDir,
+		InvoicesDir:           invoicesDir,
+		AssetsFS:              assets,
+		DocsImagesFS:          docsImages,
+		tmpl:                  tmpl,
 		sessions:              map[string]time.Time{},
 		batches:               map[string]*Batch{},
 		pendingImports:        map[string]store.Data{},
@@ -96,6 +96,7 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/invoices/new/single", s.handleInvoiceSingleForm)
 		r.Post("/invoices/new/single", s.handleInvoiceSinglePreview)
 		r.Post("/invoices/confirm", s.handleInvoicesConfirm)
+		r.Post("/invoices/send-month", s.handleInvoicesSendMonth)
 		r.Post("/invoices/{number}/status", s.handleInvoiceStatus)
 		r.Post("/invoices/{number}/delete", s.handleInvoiceDelete)
 		r.Post("/invoices/{number}/send", s.handleInvoiceSend)

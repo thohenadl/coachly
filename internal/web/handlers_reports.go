@@ -17,10 +17,10 @@ type reportLine struct {
 }
 
 type reportTile struct {
-	Label   string
-	Sub     string
-	Lines   []reportLine
-	Total   string
+	Label    string
+	Sub      string
+	Lines    []reportLine
+	Total    string
 	HasSplit bool
 }
 
@@ -115,4 +115,3 @@ func plannedYearRevenue(athletes []store.Athlete, year int) store.Money {
 	}
 	return sum
 }
-
